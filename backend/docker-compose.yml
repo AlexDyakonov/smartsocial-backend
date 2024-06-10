@@ -2,6 +2,7 @@
 
 services:
   backend:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
@@ -75,6 +76,7 @@ services:
 
   worker:
     container_name: worker
+    restart: always
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile

@@ -29,23 +29,33 @@ jobs:
 
       - name: Wait for services to be up
         run: |
-          cd backend
-          services=$(docker-compose config --services)
-          for service in $services; do
-            while ! docker-compose ps $service | grep -q "Up"; do
-              echo "Waiting for $service to be up..."
-              sleep 5
-            done
-          done
+          echo "Waiting for services to be up..."
+          sleep 30
 
-      - name: Check container status
+      - name: Check Docker Compose Services
+        run: docker-compose ps
+
+      - name: Check for unhealthy services and restarts
         run: |
-          cd backend
-          services=$(docker-compose config --services)
+          services=$(docker-compose ps --services)
           for service in $services; do
-            status=$(docker inspect -f '{{.State.Status}}' $(docker-compose ps -q $service))
-            if [ "$status" != "running" ]; then
-              echo "$service is not running."
+            health_status=$(docker inspect --format='{{json .State.Health.Status}}' $(docker-compose ps -q $service))
+            restart_count=$(docker inspect --format='{{.RestartCount}}' $(docker-compose ps -q $service))
+          
+            echo "Service: $service, Health: $health_status, Restarts: $restart_count"
+          
+            if [[ "$health_status" != "\"healthy\"" ]]; then
+              echo "Error: Service $service is not healthy"
+              docker-compose logs $service
+              exit 1
+            fi
+          
+            if [[ "$restart_count" -gt 0 ]]; then
+              echo "Error: Service $service has restarted $restart_count times"
+              docker-compose logs $service
               exit 1
             fi
           done
+
+      - name: Stop and remove Docker Compose services
+        run: docker-compose down
