@@ -24,6 +24,7 @@ jobs:
       - name: Build and start containers
         run: |
           cd backend
+          cp .env.example .env
           docker-compose up -d --build
 
       - name: Wait for services to be up
