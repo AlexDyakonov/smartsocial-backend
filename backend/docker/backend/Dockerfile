@@ -6,6 +6,14 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 EXPOSE 8000
 
+# Установка GDAL и его зависимостей (для работы с координатами)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gdal-bin \
+        libgdal-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* # Очистка кеша для уменьшения размера образа
+
 RUN pip install --upgrade pip
 
 WORKDIR /backend

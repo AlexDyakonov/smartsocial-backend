@@ -24,7 +24,6 @@ CSRF_TRUSTED_ORIGINS = []
 if scrf_subdomain := os.getenv("SCRF_SUBDOMAIN"):
     CSRF_TRUSTED_ORIGINS += [f"http://{scrf_subdomain}", f"https://{scrf_subdomain}"]
 
-
 # CORS_HEADERS
 cors_allow_headers = os.getenv("CORS_ALLOW_HEADERS")
 CORS_ALLOW_HEADERS = cors_allow_headers.split(",") if cors_allow_headers else ["*"]
@@ -32,7 +31,6 @@ CORS_ALLOW_HEADERS = cors_allow_headers.split(",") if cors_allow_headers else ["
 CORS_ORIGIN_ALLOW_ALL = os.getenv("CORS_ORIGIN_ALLOW_ALL", "False") == "True"
 
 CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "False") == "True"
-
 
 # Application definition
 
@@ -44,14 +42,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.gis',
     # External
     "rest_framework",
+    "rest_framework_gis",
     "rest_framework_swagger",
     "drf_yasg",
     # Celery
     "django_celery_results",
     # Custom
     "apps.api",
+    "apps.sandbox",
 ]
 
 # User model
@@ -100,7 +101,7 @@ DATABASES = (
     if os.getenv("SQLITE") == "True"
     else {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
             "NAME": os.getenv("POSTGRES_DB"),
             "USER": os.getenv("POSTGRES_USER"),
             "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
@@ -177,7 +178,6 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = "redis://" + os.getenv("REDIS_HOST") + ":" + os.getenv("REDIS_PORT")
 CELERY_RESULT_BACKEND = "django-db"
 
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -202,7 +202,6 @@ EMAIL_USE_SSL = False
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-
 
 # Logging
 LOGGING = {
