@@ -33,10 +33,13 @@ jobs:
           sleep 30
 
       - name: Check Docker Compose Services
-        run: docker-compose ps
+        run: |
+          cd backend
+          docker-compose ps
 
       - name: Check for unhealthy services and restarts
         run: |
+          cd backend
           services=$(docker-compose ps --services)
           for service in $services; do
             health_status=$(docker inspect --format='{{json .State.Health.Status}}' $(docker-compose ps -q $service))
@@ -58,4 +61,6 @@ jobs:
           done
 
       - name: Stop and remove Docker Compose services
-        run: docker-compose down
+        run: |
+          cd backend
+          docker-compose down
