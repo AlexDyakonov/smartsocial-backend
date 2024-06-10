@@ -42,12 +42,13 @@ jobs:
           cd backend
           services=$(docker-compose ps --services)
           for service in $services; do
-            health_status=$(docker inspect --format='{{json .State.Health.Status}}' $(docker-compose ps -q $service))
-            restart_count=$(docker inspect --format='{{.RestartCount}}' $(docker-compose ps -q $service))
+            container_id=$(docker-compose ps -q $service)
+            health_status=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}no-health-check{{end}}' $container_id)
+            restart_count=$(docker inspect --format='{{.RestartCount}}' $container_id)
           
             echo "Service: $service, Health: $health_status, Restarts: $restart_count"
           
-            if [[ "$health_status" != "\"healthy\"" ]]; then
+            if [[ "$health_status" != "healthy" && "$health_status" != "no-health-check" ]]; then
               echo "Error: Service $service is not healthy"
               docker-compose logs $service
               exit 1
