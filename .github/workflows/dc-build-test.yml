@@ -1,22 +1,46 @@
-name: Docker-compose test
+name: Docker Compose CI
 
 on:
   push:
-    branches: [ master ]
-
-  pull_request:
-    branches: [ master ]
-
   workflow_dispatch:
 
 jobs:
-  build-test:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Copy env
-        working-directory: ./backend
-        run: cp .env.example .env
-      - name: Build the dc file
-        working-directory: ./backend
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Set up Docker Compose
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Compose
+        run: sudo apt-get install docker-compose
+
+      - name: Build and start containers
         run: docker-compose up -d --build
+
+      - name: Wait for services to be up
+        run: |
+          services=$(docker-compose config --services)
+          for service in $services; do
+            while ! docker-compose ps $service | grep -q "Up"; do
+              echo "Waiting for $service to be up..."
+              sleep 5
+            done
+          done
+
+      - name: Check container status
+        run: |
+          services=$(docker-compose config --services)
+          for service in $services; do
+            status=$(docker inspect -f '{{.State.Status}}' $(docker-compose ps -q $service))
+            if [ "$status" != "running" ]; then
+              echo "$service is not running."
+              exit 1
+            fi
+          done
