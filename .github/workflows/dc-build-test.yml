@@ -1,0 +1,22 @@
+name: Docker-compose test
+
+on:
+  push:
+    branches: [ master ]
+
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Copy env
+        working-directory: ./backend
+        run: cp .env.example .env
+      - name: Build the dc file
+        working-directory: ./backend
+        run: docker-compose up -d --build
