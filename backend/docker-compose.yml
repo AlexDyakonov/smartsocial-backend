@@ -14,6 +14,7 @@ services:
     depends_on:
       - database
       - broker
+    stop_grace_period: 1s
     ports:
       - "8000:8000"
     networks:

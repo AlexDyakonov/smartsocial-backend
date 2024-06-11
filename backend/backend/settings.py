@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     # Custom
     "apps.core",
+    "apps.booking",
     "apps.sandbox",
 ]
 
