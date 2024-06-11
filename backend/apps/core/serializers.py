@@ -49,4 +49,4 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ('id', 'event', 'min_capacity', 'max_capacity', 'recurrence_rule', 'tickets')
+        fields = ('id', 'event', 'min_capacity', 'max_capacity', 'icalendar_data', 'tickets')
