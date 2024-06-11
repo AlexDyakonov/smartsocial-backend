@@ -12,15 +12,13 @@ class Buyer(models.Model):
 class Cart(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    tickets = models.ManyToManyField(Ticket, through='CartTicket')
 
 
 class CartTicket(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='tickets')
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     time = models.DateTimeField()
     quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class Booking(models.Model):

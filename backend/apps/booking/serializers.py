@@ -1,21 +1,27 @@
 from rest_framework import serializers
-from .models import Cart, CartTicket, Buyer
+from apps.core.models import Ticket
+from apps.core.serializers import TicketSerializer
+from .models import Cart, CartTicket, Buyer, Order
 
 
 class CartTicketInputSerializer(serializers.ModelSerializer):
+    ticket = serializers.PrimaryKeyRelatedField(queryset=Ticket.objects.all())
+
     class Meta:
         model = CartTicket
-        fields = ('ticket', 'time', 'quantity', 'price')
+        fields = ('ticket', 'time', 'quantity')
 
 
 class CartTicketOutputSerializer(serializers.ModelSerializer):
+    ticket = TicketSerializer(many=False)
+
     class Meta:
         model = CartTicket
-        fields = ('id', 'ticket', 'time', 'quantity', 'price')
+        fields = ('id', 'ticket', 'time', 'quantity')
 
 
 class CartInputSerializer(serializers.ModelSerializer):
-    tickets = CartTicketOutputSerializer(many=True)
+    tickets = CartTicketInputSerializer(many=True)
 
     class Meta:
         model = Cart
@@ -50,3 +56,9 @@ class BuyerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buyer
         fields = ('id', 'email', 'phone', 'first_name', 'last_name')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ('id', 'cart', 'payment', 'status', 'total')
