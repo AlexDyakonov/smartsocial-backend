@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     # Celery
     "django_celery_results",
     # Custom
-    "apps.api",
+    "apps.core",
     "apps.sandbox",
 ]
 
@@ -188,7 +188,7 @@ CACHES = {
 CELERY_CACHE_BACKEND = "default"
 
 # Сюда добавлять новые приложения, которые используют shared таски
-CELERY_IMPORTS = ("apps.api.tasks",)
+# CELERY_IMPORTS = ("apps.api.tasks",)
 
 # Email
 EMAIL_BACKEND = (
