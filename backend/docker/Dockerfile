@@ -25,4 +25,4 @@ RUN pip install gunicorn
 
 COPY . .
 
-RUN ["chmod", "+x", "./docker/backend/run.sh"]
+RUN ["chmod", "+x", "./docker/run.sh"]
