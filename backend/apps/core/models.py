@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models as gis_models
+import icalendar as ical
 
 
 class Place(models.Model):
@@ -42,8 +43,11 @@ class Schedule(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     min_capacity = models.IntegerField()
     max_capacity = models.IntegerField()
-    recurrence_rule = models.JSONField()
+    icalendar_data = models.TextField()
     tickets = models.ManyToManyField(Ticket)
+
+    def icalendar(self):
+        return ical.Calendar.from_ical(self.icalendar)
 
     def __str__(self):
         return f"{self.event.name}"
