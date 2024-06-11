@@ -42,5 +42,7 @@ swagger_patterns = [
     ),
 ]
 
-if settings.DEBUG:
-    urlpatterns += swagger_patterns
+urlpatterns += swagger_patterns
+
+# if settings.DEBUG:
+#     urlpatterns += swagger_patterns

@@ -1,13 +1,10 @@
-# DEV DOCKER
-
 services:
   backend:
     restart: unless-stopped
     build:
       context: .
-      dockerfile: ./docker/backend/Dockerfile
-    command:
-      - ./docker/backend/run.sh
+      dockerfile: ./docker/Dockerfile
+    command: ./docker/run.sh
     container_name: backend
     env_file:
       - .env
@@ -17,6 +14,11 @@ services:
     depends_on:
       - database
       - broker
+    ports:
+      - "8000:8000"
+    networks:
+      - database
+      - backend
 
   database:
     restart: unless-stopped
@@ -33,6 +35,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - database
+      - backend
 
   adminer:
     image: adminer
@@ -44,23 +49,8 @@ services:
       - '1000:8080'
     depends_on:
       - database
-
-  nginx:
-    restart: unless-stopped
-    build:
-      dockerfile: ./Dockerfile
-      context: ./docker/nginx/
-    container_name: nginx
-    volumes:
-      - ./static:/backend/static:consistent
-      - ./media:/backend/media:consistent
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    depends_on:
-      - backend
-    env_file:
-      - .env
-    ports:
-      - "${NGINX_EXTERNAL_PORT:-80}:80"
+    networks:
+      - database
 
   broker:
     container_name: broker
@@ -73,13 +63,15 @@ services:
     volumes:
       - ./redis/data:/root/redis
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - database
 
   worker:
     container_name: worker
     restart: always
     build:
       context: .
-      dockerfile: ./docker/backend/Dockerfile
+      dockerfile: ./docker/Dockerfile
     command: celery -A backend worker -l info
     volumes:
       - .:/backend
@@ -89,3 +81,10 @@ services:
       - database
       - broker
       - backend
+    networks:
+      - database
+      - backend
+
+networks:
+  database:
+  backend:
