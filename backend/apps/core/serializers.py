@@ -8,7 +8,7 @@ class PlaceInputSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ('id', 'name', 'description', 'address', 'location', 'images')
+        fields = ('name', 'description', 'address', 'location', 'images')
 
     def create(self, validated_data):
         location = geos.Point(validated_data.pop('location')[0], validated_data.pop('location')[1])

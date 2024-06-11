@@ -26,6 +26,7 @@ urlpatterns = [
     # Custom
     path("api/v1/admin/", admin.site.urls),
     path("api/v1/", include("apps.core.urls")),
+    path("api/v1/", include("apps.booking.urls")),
     path("api/v1/sandbox/", include("apps.sandbox.urls")),
 ]
 

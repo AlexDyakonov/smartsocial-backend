@@ -17,6 +17,7 @@ services:
     depends_on:
       - database
       - broker
+    stop_grace_period: 1s
 
   database:
     restart: unless-stopped
