@@ -15,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = os.getenv("DEBUG_MODE", "True") == "True"
 
+
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split() or []
 
 CSRF_TRUSTED_ORIGINS = []
@@ -205,8 +206,8 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Yokassa
 # https://yookassa.ru/developers/payment-acceptance/getting-started/quick-start?codeLang=python
-Configuration.account_id = os.getenv("YOOKASSA_ACCOUNT_ID")
-Configuration.secret_key = os.getenv("YOOKASSA_SECRET_KEY")
+YOOKASSA_ACCOUNT_ID = os.getenv("YOOKASSA_ACCOUNT_ID")
+YOOKASSA_SECRET_KEY = os.getenv("YOOKASSA_SECRET_KEY")
 
 
 # Logging

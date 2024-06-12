@@ -1,5 +1,5 @@
-from django.db import models
 from apps.core.models import Event, Ticket
+from django.db import models
 
 
 class Buyer(models.Model):
@@ -15,7 +15,7 @@ class Cart(models.Model):
 
 
 class CartTicket(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='tickets')
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="tickets")
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     time = models.DateTimeField()
     quantity = models.IntegerField()
@@ -26,10 +26,3 @@ class Booking(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     time = models.DateTimeField()
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-
-
-class Order(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    payment = models.CharField(max_length=255)
-    status = models.CharField(max_length=255)
-    total = models.DecimalField(max_digits=10, decimal_places=2)

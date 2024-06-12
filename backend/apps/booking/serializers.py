@@ -1,7 +1,8 @@
-from rest_framework import serializers
 from apps.core.models import Ticket
 from apps.core.serializers import TicketSerializer
-from .models import Cart, CartTicket, Buyer, Order
+from rest_framework import serializers
+
+from .models import Buyer, Cart, CartTicket
 
 
 class CartTicketInputSerializer(serializers.ModelSerializer):
@@ -9,7 +10,7 @@ class CartTicketInputSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartTicket
-        fields = ('ticket', 'time', 'quantity')
+        fields = ("ticket", "time", "quantity")
 
 
 class CartTicketOutputSerializer(serializers.ModelSerializer):
@@ -17,7 +18,7 @@ class CartTicketOutputSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartTicket
-        fields = ('id', 'ticket', 'time', 'quantity')
+        fields = ("id", "ticket", "time", "quantity")
 
 
 class CartInputSerializer(serializers.ModelSerializer):
@@ -25,17 +26,17 @@ class CartInputSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ('id', 'buyer', 'tickets')
+        fields = ("id", "buyer", "tickets")
 
     def create(self, validated_data):
-        tickets_data = validated_data.pop('tickets')
+        tickets_data = validated_data.pop("tickets")
         cart = Cart.objects.create(**validated_data)
         for ticket_data in tickets_data:
             CartTicket.objects.create(cart=cart, **ticket_data)
         return cart
 
     def update(self, instance, validated_data):
-        tickets_data = validated_data.pop('tickets', [])
+        tickets_data = validated_data.pop("tickets", [])
         CartTicket.objects.filter(cart=instance).delete()
         for ticket_data in tickets_data:
             CartTicket.objects.create(cart=instance, **ticket_data)
@@ -44,21 +45,15 @@ class CartInputSerializer(serializers.ModelSerializer):
 
 class CartOutputSerializer(serializers.ModelSerializer):
     buyer = serializers.PrimaryKeyRelatedField(read_only=True)
-    created_at = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     tickets = CartTicketOutputSerializer(many=True)
 
     class Meta:
         model = Cart
-        fields = ('id', 'buyer', 'created_at', 'tickets')
+        fields = ("id", "buyer", "created_at", "tickets")
 
 
 class BuyerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buyer
-        fields = ('id', 'email', 'phone', 'first_name', 'last_name')
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ('id', 'cart', 'payment', 'status', 'total')
+        fields = ("id", "email", "phone", "first_name", "last_name")

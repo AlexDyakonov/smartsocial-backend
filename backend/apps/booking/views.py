@@ -1,10 +1,14 @@
 from datetime import datetime, timedelta
 
-from rest_framework import generics
-from rest_framework import status
+from apps.core.models import Event, Place
+from apps.core.serializers import EventSerializer, PlaceOutputSerializer
+from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .dto import EventWithDate, EventWithDateSerializer
+from .models import Buyer, Cart
+from .serializers import BuyerSerializer, CartInputSerializer, CartOutputSerializer
 from .dto import EventWithDateSerializer, EventWithDate
 from .models import Cart, Buyer, Order
 from .serializers import OrderSerializer
@@ -26,7 +30,7 @@ class CartListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = CartOutputSerializer
 
     def get_serializer_class(self):
-        if self.request.method == 'POST':
+        if self.request.method == "POST":
             return CartInputSerializer
         return CartOutputSerializer
 
@@ -36,7 +40,7 @@ class CartRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = CartOutputSerializer
 
     def get_serializer_class(self):
-        if self.request.method == 'PUT' or self.request.method == 'PATCH':
+        if self.request.method == "PUT" or self.request.method == "PATCH":
             return CartInputSerializer
         return CartOutputSerializer
 
@@ -88,7 +92,10 @@ class PlacesAvailableApiView(APIView):
         if queryset:
             serializer = self.serializer_class(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"error": "Internal server error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 class EventsAvailableApiView(APIView):
