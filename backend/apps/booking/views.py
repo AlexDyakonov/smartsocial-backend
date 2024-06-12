@@ -1,7 +1,11 @@
+from datetime import datetime, timedelta
+
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .dto import EventWithDateSerializer, EventWithDate
 from .models import Cart, Buyer, Order
 from .serializers import OrderSerializer
 from apps.core.models import Place, Event
@@ -85,9 +89,20 @@ class PlacesAvailableApiView(APIView):
 
 
 class EventsAvailableApiView(APIView):
-    serializer_class = EventSerializer
+    serializer_class = EventWithDateSerializer
 
     def get(self, request, pk):
         queryset = Event.objects.filter(place_id=pk).all()
-        serializer = self.serializer_class(queryset, many=True)
+        events = [EventWithDate(
+            id=e.id,
+            place_id=e.place.id,
+            name=e.name,
+            description=e.description,
+            capacity=e.max_capacity,
+            tickets=e.tickets.all(),
+
+            start_datetime=datetime.now(),
+            end_datetime=datetime.now() + timedelta(hours=1),
+        ) for e in queryset]
+        serializer = self.serializer_class(events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

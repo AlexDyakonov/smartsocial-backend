@@ -3,29 +3,32 @@ from .models import Place, Event, Ticket
 import django.contrib.gis.geos as geos
 
 
+class PointField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'lat': value.y,
+            'lon': value.x
+        }
+
+    def to_internal_value(self, data):
+        try:
+            lat = data['lat']
+            lon = data['lon']
+            return geos.Point(x=lon, y=lat)
+        except (KeyError, TypeError):
+            raise serializers.ValidationError("Invalid input for a Point instance.")
+
+
 class PlaceInputSerializer(serializers.ModelSerializer):
-    location = serializers.ListField(child=serializers.FloatField())
+    location = PointField()
 
     class Meta:
         model = Place
         fields = ('name', 'description', 'address', 'location', 'images')
 
-    def create(self, validated_data):
-        location_list = validated_data.pop('location')
-        location = geos.Point(location_list[0], location_list[1])
-        return Place.objects.create(location=location, **validated_data)
-
-    def update(self, instance, validated_data):
-        location_list = validated_data.pop('location')
-        instance.location = geos.Point(location_list[0], location_list[1])
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
-
 
 class PlaceOutputSerializer(serializers.ModelSerializer):
-    location = serializers.ListField(child=serializers.FloatField())
+    location = PointField()
 
     class Meta:
         model = Place
