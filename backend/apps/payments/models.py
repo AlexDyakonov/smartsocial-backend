@@ -1,4 +1,4 @@
-from booking.models import Cart
+from apps.booking.models import Cart
 from django.db import models
 
 
