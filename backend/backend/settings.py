@@ -47,9 +47,10 @@ INSTALLED_APPS = [
     # Celery
     "django_celery_results",
     # Custom
+    "apps.api",
     "apps.core",
     "apps.booking",
-    "apps.sandbox",
+    "apps.payments",
 ]
 
 # User model
