@@ -12,13 +12,13 @@ class Order(models.Model):
 
     PAYMENT_STATUS_CHOICES = [
         ("pending", "Ожидание оплаты"),
-        ("paid", "Оплачено"),
-        ("failed", "Ошибка оплаты"),
-        ("refunded", "Возврат средств"),
+        ("waiting_for_capture", "Платеж оплачен, ожидают списания"),
+        ("succeeded", "Платеж успешно завершен"),
+        ("canceled", "Платеж отменен"),
     ]
 
     payment_status = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=PAYMENT_STATUS_CHOICES,
         default="pending",
     )
