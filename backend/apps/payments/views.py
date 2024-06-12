@@ -31,7 +31,6 @@ class PaymentProcessingView(generics.GenericAPIView):
             "confirmation_token"
         )
 
-        # Create Order instance
         try:
             with transaction.atomic():
                 order = Order.objects.create(

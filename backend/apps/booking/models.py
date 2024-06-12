@@ -1,5 +1,6 @@
 from apps.core.models import Event, Ticket
 from django.db import models
+from django.db.models import F, Sum
 
 
 class Buyer(models.Model):
@@ -12,6 +13,15 @@ class Buyer(models.Model):
 class Cart(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def total(self):
+        return (
+            self.tickets.aggregate(total=Sum(F("ticket__price") * F("quantity")))[
+                "total"
+            ]
+            or 0
+        )
 
 
 class CartTicket(models.Model):
