@@ -24,10 +24,8 @@ urlpatterns = [
     #    "api/redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     # ),
     # Custom
+    path("api/v1/", include("apps.api.urls")),
     path("api/v1/admin/", admin.site.urls),
-    path("api/v1/", include("apps.core.urls")),
-    path("api/v1/", include("apps.booking.urls")),
-    path("api/v1/sandbox/", include("apps.sandbox.urls")),
 ]
 
 swagger_patterns = [
