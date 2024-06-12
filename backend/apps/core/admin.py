@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Place, Event, Ticket, Schedule
+from .models import Place, Event, Ticket
 from django.contrib.gis.admin import GISModelAdmin
 
 
@@ -17,11 +17,5 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'ticket_type', 'price', 'event', 'personas')
-    search_fields = ('name', 'ticket_type', 'event__name')
-
-
-@admin.register(Schedule)
-class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'event', 'min_capacity', 'max_capacity')
-    search_fields = ('event__name',)
+    list_display = ('id', 'name', 'type', 'price', 'place', 'personas')
+    search_fields = ('name', 'type', 'event__name')

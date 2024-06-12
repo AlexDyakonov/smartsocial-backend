@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Cart, Buyer, Order
 from .serializers import OrderSerializer
+from apps.core.models import Place, Event
+from apps.core.serializers import PlaceOutputSerializer, EventSerializer
 
 from .serializers import (
     CartInputSerializer,
@@ -69,3 +71,23 @@ class OrderAPIView(APIView):
             serializer = self.serializer_class(queryset)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({"error": "No order found for this cart"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class PlacesAvailableApiView(APIView):
+    serializer_class = PlaceOutputSerializer
+
+    def get(self, request):
+        queryset = Place.objects.all()
+        if queryset:
+            serializer = self.serializer_class(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class EventsAvailableApiView(APIView):
+    serializer_class = EventSerializer
+
+    def get(self, request, pk):
+        queryset = Event.objects.filter(place_id=pk).all()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
