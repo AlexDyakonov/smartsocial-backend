@@ -3,19 +3,16 @@ from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
+from yookassa import Configuration
 
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG_MODE", "True") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split() or []
@@ -27,13 +24,11 @@ if scrf_subdomain := os.getenv("SCRF_SUBDOMAIN"):
 # CORS_HEADERS
 cors_allow_headers = os.getenv("CORS_ALLOW_HEADERS")
 CORS_ALLOW_HEADERS = cors_allow_headers.split(",") if cors_allow_headers else ["*"]
-
 CORS_ORIGIN_ALLOW_ALL = os.getenv("CORS_ORIGIN_ALLOW_ALL", "False") == "True"
-
 CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "False") == "True"
 
-# Application definition
 
+# Application definition
 INSTALLED_APPS = [
     "jazzmin",
     "django.contrib.admin",
@@ -136,25 +131,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_URL = "/api/v1/static/"
-
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/staticfiles')]
-
 MEDIA_URL = "/api/v1/media/"
-
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/staticfiles')]
 
 # Static file storage
 STORAGES = {
@@ -187,7 +174,6 @@ REST_FRAMEWORK = {
 # }
 
 # CELERY
-
 CELERY_BROKER_URL = "redis://" + os.getenv("REDIS_HOST") + ":" + os.getenv("REDIS_PORT")
 CELERY_RESULT_BACKEND = "django-db"
 
@@ -215,6 +201,12 @@ EMAIL_USE_SSL = False
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+# Yokassa
+# https://yookassa.ru/developers/payment-acceptance/getting-started/quick-start?codeLang=python
+Configuration.account_id = os.getenv("YOOKASSA_ACCOUNT_ID")
+Configuration.secret_key = os.getenv("YOOKASSA_SECRET_KEY")
+
 
 # Logging
 LOGGING = {
