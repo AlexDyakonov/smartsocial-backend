@@ -2,7 +2,6 @@ from rest_framework import generics
 from .models import (
     Event,
     Place,
-    Schedule,
     Ticket,
 )
 from .serializers import (
@@ -10,7 +9,6 @@ from .serializers import (
     PlaceOutputSerializer,
     EventSerializer,
     TicketSerializer,
-    ScheduleSerializer,
 )
 
 
@@ -52,13 +50,3 @@ class TicketListCreateAPIView(generics.ListCreateAPIView):
 class TicketRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-
-
-class ScheduleListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Schedule.objects.all()
-    serializer_class = ScheduleSerializer
-
-
-class ScheduleRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Schedule.objects.all()
-    serializer_class = ScheduleSerializer

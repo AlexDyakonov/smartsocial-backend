@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Place, Event, Ticket, Schedule
+from .models import Place, Event, Ticket
 import django.contrib.gis.geos as geos
 
 
@@ -11,11 +11,13 @@ class PlaceInputSerializer(serializers.ModelSerializer):
         fields = ('name', 'description', 'address', 'location', 'images')
 
     def create(self, validated_data):
-        location = geos.Point(validated_data.pop('location')[0], validated_data.pop('location')[1])
+        location_list = validated_data.pop('location')
+        location = geos.Point(location_list[0], location_list[1])
         return Place.objects.create(location=location, **validated_data)
 
     def update(self, instance, validated_data):
-        instance.location = geos.Point(validated_data.pop('location')[0], validated_data.pop('location')[1])
+        location_list = validated_data.pop('location')
+        instance.location = geos.Point(location_list[0], location_list[1])
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()
@@ -35,18 +37,20 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('id', 'place', 'name', 'description', 'duration_minutes')
+        fields = (
+            'id',
+            'place',
+            'name',
+            'description',
+            'duration_minutes',
+            'icalendar_data',
+            'min_capacity',
+            'max_capacity',
+            'tickets',
+        )
 
 
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
-        fields = ('id', 'name', 'ticket_type', 'price', 'event', 'personas')
-
-
-class ScheduleSerializer(serializers.ModelSerializer):
-    tickets = serializers.PrimaryKeyRelatedField(queryset=Ticket.objects.all(), many=True)
-
-    class Meta:
-        model = Schedule
-        fields = ('id', 'event', 'min_capacity', 'max_capacity', 'icalendar_data', 'tickets')
+        fields = ('id', 'name', 'type', 'price', 'place', 'personas')
