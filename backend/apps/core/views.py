@@ -1,4 +1,6 @@
 from rest_framework import generics
+from rest_framework.views import APIView, Response
+from rest_framework import status
 from .models import (
     Event,
     Place,
@@ -40,6 +42,14 @@ class EventListCreateAPIView(generics.ListCreateAPIView):
 class EventRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+
+class EventTicketsAPIView(APIView):
+    serializer_class = TicketSerializer
+
+    def get(self, request, pk):
+        tickets = Event.objects.filter(pk=pk).first().tickets.all()
+        return Response(self.serializer_class(tickets, many=True).data, status.HTTP_200_OK)
 
 
 class TicketListCreateAPIView(generics.ListCreateAPIView):

@@ -15,7 +15,6 @@ class EventWithDate:
     capacity: int
     start_datetime: datetime
     end_datetime: datetime
-    tickets: list[Ticket]
 
 
 class EventWithDateSerializer(serializers.Serializer):
@@ -26,4 +25,3 @@ class EventWithDateSerializer(serializers.Serializer):
     capacity = serializers.IntegerField()
     start_datetime = serializers.DateTimeField()
     end_datetime = serializers.DateTimeField()
-    tickets = TicketSerializer(many=True, read_only=True)
