@@ -8,7 +8,7 @@ class Place(models.Model):
     description = models.TextField()
     address = models.TextField()
     location = gis_models.PointField()
-    images = models.ImageField()
+    images = models.JSONField()
 
     def __str__(self):
         return self.name
