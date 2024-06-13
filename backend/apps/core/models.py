@@ -1,6 +1,6 @@
-from django.db import models
-from django.contrib.gis.db import models as gis_models
 import icalendar as ical
+from django.contrib.gis.db import models as gis_models
+from django.db import models
 
 
 class Place(models.Model):
@@ -15,8 +15,16 @@ class Place(models.Model):
 
 
 class Ticket(models.Model):
+    TICKET_TYPE_CHOICES = [
+        ("family", "Семейный"),
+        ("group", "Групповой"),
+        ("adult", "Взрослый"),
+        ("child", "Детский"),
+        ("discount", "Льготный"),
+    ]
+
     name = models.CharField(max_length=255)
-    type = models.CharField(max_length=255)
+    type = models.CharField(max_length=50, choices=TICKET_TYPE_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
     personas = models.IntegerField()
