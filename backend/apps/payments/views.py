@@ -1,5 +1,10 @@
+import json
+
 from apps.booking.models import Buyer, Cart
+from apps.payments.models import Order
 from django.db import transaction
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, status
 from rest_framework.response import Response
 
@@ -7,10 +12,6 @@ from .models import Order
 from .serializers import PaymentProcessingSerializer
 from .services import YooKassaService
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from apps.payments.models import Order
-import json
 
 class PaymentProcessingView(generics.GenericAPIView):
     serializer_class = PaymentProcessingSerializer
@@ -21,11 +22,14 @@ class PaymentProcessingView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         cart_id = serializer.validated_data.get("cart_id")
+        return_url = serializer.validated_data.get("return_url")
         buyer_data = serializer.validated_data.get("buyer")
 
         cart = Cart.objects.filter(id=cart_id).first()
         if not cart:
-            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         try:
             buyer, created = Buyer.objects.update_or_create(
@@ -37,12 +41,16 @@ class PaymentProcessingView(generics.GenericAPIView):
                 },
             )
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         cart.buyer = buyer
-        cart.save(update_fields=['buyer'])
+        cart.save(update_fields=["buyer"])
 
-        existing_order = Order.objects.filter(cart_id=cart_id, payment_status="pending").first()
+        existing_order = Order.objects.filter(
+            cart_id=cart_id, payment_status="pending"
+        ).first()
         if existing_order:
             return Response(
                 {
@@ -58,11 +66,16 @@ class PaymentProcessingView(generics.GenericAPIView):
 
         payment_response = YooKassaService.create_payment_embedded("10", cart_id)
         if not payment_response:
-            return Response({"error": "Payment service error"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            return Response(
+                {"error": "Payment service error"},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
         payment_id = payment_response.get("id")
         payment_status = payment_response.get("status")
-        confirmation_token = payment_response.get("confirmation", {}).get("confirmation_token")
+        confirmation_token = payment_response.get("confirmation", {}).get(
+            "confirmation_token"
+        )
 
         if payment_id and payment_status:
             try:
@@ -71,12 +84,14 @@ class PaymentProcessingView(generics.GenericAPIView):
                         cart=cart,
                         total=cart.total,
                         payment_id=payment_id,
-                        return_url="https://kolomnago.ru",
+                        return_url=return_url,
                         confirmation_token=confirmation_token,
                         payment_status=payment_status,
                     )
             except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
             return Response(
                 {
@@ -84,14 +99,17 @@ class PaymentProcessingView(generics.GenericAPIView):
                     "confirmation_token": confirmation_token,
                     "payment_id": payment_id,
                     "payment_status": payment_status,
-                    "return_url": "https://kolomnago.ru",
+                    "return_url": return_url,
                     "cart_id": cart_id,
                     "order_id": order.id,
                 },
                 status=status.HTTP_200_OK,
             )
         else:
-            return Response({"error": "Invalid payment response"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "Invalid payment response"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 @csrf_exempt
@@ -116,4 +134,3 @@ def yookassa_webhook(request):
             return JsonResponse({"error": "Invalid JSON"}, status=400)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
-    
