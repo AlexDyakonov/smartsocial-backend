@@ -23,6 +23,9 @@ if scrf_subdomain := os.getenv("SCRF_SUBDOMAIN"):
     CSRF_TRUSTED_ORIGINS += [f"http://{scrf_subdomain}", f"https://{scrf_subdomain}"]
 
 # CORS_HEADERS
+cors_allow_origins = os.getenv("CORS_ALLOWED_ORIGINS")
+CORS_ALLOWED_ORIGINS = cors_allow_origins.split(",") if cors_allow_origins else []
+
 cors_allow_headers = os.getenv("CORS_ALLOW_HEADERS")
 CORS_ALLOW_HEADERS = cors_allow_headers.split(",") if cors_allow_headers else ["*"]
 CORS_ORIGIN_ALLOW_ALL = os.getenv("CORS_ORIGIN_ALLOW_ALL", "False") == "True"
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.gis",
     # External
     "rest_framework",
+    "corsheaders",
     "rest_framework_gis",
     "rest_framework_swagger",
     "drf_yasg",
@@ -61,6 +65,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
