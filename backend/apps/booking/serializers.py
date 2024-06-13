@@ -23,6 +23,9 @@ class CartTicketOutputSerializer(serializers.ModelSerializer):
 
 class CartInputSerializer(serializers.ModelSerializer):
     tickets = CartTicketInputSerializer(many=True)
+    buyer = serializers.PrimaryKeyRelatedField(
+        queryset=Buyer.objects.all(), required=False, allow_null=True
+    )
 
     class Meta:
         model = Cart

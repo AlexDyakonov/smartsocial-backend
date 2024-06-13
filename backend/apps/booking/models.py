@@ -11,7 +11,7 @@ class Buyer(models.Model):
 
 
 class Cart(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE)
+    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
