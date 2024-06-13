@@ -8,6 +8,7 @@ from .views import (
     EventsAvailableApiView,
     PlacesAvailableApiView,
 )
+from .amo import BookingsAmoAPIView
 
 urlpatterns = [
     path("buyers/", BuyerListCreateAPIView.as_view(), name="buyer-list-create"),
@@ -22,4 +23,5 @@ urlpatterns = [
         EventsAvailableApiView.as_view(),
         name="events-available",
     ),
+    path("bookings/amo/", BookingsAmoAPIView.as_view(), name="bookings-amo")
 ]

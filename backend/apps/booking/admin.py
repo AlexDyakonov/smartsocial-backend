@@ -16,10 +16,6 @@ class CartAdmin(admin.ModelAdmin):
     search_fields = ("id",)
     readonly_fields = ("id", "created_at")
 
-    def has_add_permission(self, request):
-        # Disable the ability to add new carts directly from the admin
-        return False
-
 
 @admin.register(CartTicket)
 class CartTicketAdmin(admin.ModelAdmin):
