@@ -90,7 +90,6 @@ class EventsAvailableApiView(APIView):
         events_with_date: list[EventWithDate] = []
         for event in events_queryset:
             cal = event.icalendar()
-            print(event)
             events = rec_ical.of(cal).between(start_datetime, end_datetime)
 
             for e in events:

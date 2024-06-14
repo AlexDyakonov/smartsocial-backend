@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "apps.booking",
     "apps.payments",
     "apps.amo",
+    "apps.mailer",
 ]
 
 # User model
@@ -274,6 +275,11 @@ JAZZMIN_SETTINGS = {
             "name": "Landing page",
             "url": "https://google.com",
             "new_window": True,
+        },
+        {
+            "name": "Mailing admin",
+            "url": "mailing-admin",
+            "new_window": False,
         },
     ],
     #############

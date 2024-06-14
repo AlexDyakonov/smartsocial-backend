@@ -65,3 +65,5 @@ whitenoise==6.6.0
 wrapt==1.16.0
 x-wr-timezone==0.0.7
 yookassa==3.1.0
+
+beautifulsoup4~=4.12.3
