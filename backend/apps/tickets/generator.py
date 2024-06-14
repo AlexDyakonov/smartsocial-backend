@@ -32,7 +32,9 @@ def check_page_space(y_position, c, height):
     return y_position
 
 
-def create_ticket_template(ticket_info, output_file):
+def create_ticket_template(ticket_info):
+    output_file = ticket_info["output_file"]
+
     c = canvas.Canvas(output_file, pagesize=A4)
     width, height = A4
 
@@ -96,11 +98,3 @@ def create_ticket_template(ticket_info, output_file):
     # Завершение и сохранение PDF
     c.showPage()
     c.save()
-
-    # TODO FIX
-    order = Order.objects.get(payment_id="2dfd28ac-000f-5000-a000-1a776437c021")
-
-    with open(output_file, "rb") as f:
-        order.ticket_file.save(output_file, File(f))
-
-    order.save()
