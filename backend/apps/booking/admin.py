@@ -3,6 +3,11 @@ from django.contrib import admin
 from .models import Booking, Buyer, Cart, CartTicket
 
 
+class CartTicketsInline(admin.TabularInline):
+    model = CartTicket
+    extra = 1
+
+
 @admin.register(Buyer)
 class BuyerAdmin(admin.ModelAdmin):
     list_display = ("id", "email", "phone", "first_name", "last_name")
@@ -11,10 +16,11 @@ class BuyerAdmin(admin.ModelAdmin):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ("id", "buyer", "created_at")
+    list_display = ("id", "buyer", "created_at", "total_places", "total")
     list_filter = ("buyer", "created_at")
     search_fields = ("id",)
     readonly_fields = ("id", "created_at")
+    inlines = [CartTicketsInline]
 
 
 @admin.register(CartTicket)
