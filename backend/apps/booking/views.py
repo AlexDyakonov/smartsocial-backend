@@ -1,3 +1,5 @@
+import dataclasses
+import json
 from datetime import datetime
 
 from rest_framework import generics, status
@@ -5,7 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .dto import EventWithDateSerializer, EventWithDate
+from .dto import EventWithDateSerializer, EventWithDate, TicketWithDate
 from .models import Cart, Buyer
 from apps.core.models import Place, Event
 from apps.booking.models import Booking
@@ -77,7 +79,6 @@ class EventsAvailableApiView(APIView):
             )
         ])
     def get(self, request, pk):
-        events_queryset = Event.objects.filter(place_id=pk).all()
         try:
             start_datetime = datetime.fromisoformat(request.query_params.get('start_datetime'))
             end_datetime = datetime.fromisoformat(request.query_params.get('end_datetime'))
@@ -87,6 +88,7 @@ class EventsAvailableApiView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        events_queryset = Event.objects.filter(place_id=pk).all()
         events_with_date: list[EventWithDate] = []
         for event in events_queryset:
             cal = event.icalendar()
@@ -109,3 +111,53 @@ class EventsAvailableApiView(APIView):
                 ).count()
         serializer = EventWithDateSerializer(events_with_date, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TicketsAvailableApiView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'start_datetime', openapi.IN_QUERY, description="start datetime",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'end_datetime', openapi.IN_QUERY, description="end datetime",
+                type=openapi.TYPE_STRING
+            )
+        ])
+    def get(self, request, pk):
+        try:
+            start_datetime = datetime.fromisoformat(request.query_params.get('start_datetime'))
+            end_datetime = datetime.fromisoformat(request.query_params.get('end_datetime'))
+        except ValueError:
+            return Response(
+                {"error": "Invalid date format. Use ISO 8601 format: YYYY-MM-DDTHH:MM:SS"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        event: Event = Event.objects.filter(pk=pk).first()
+        cal = event.icalendar()
+        events = rec_ical.of(cal).between(start_datetime, end_datetime)
+
+        dates = []
+        for e in events:
+            dates.append(e["DTSTART"].dt)
+
+        tickets_with_date: list[TicketWithDate] = []
+        for ticket in event.tickets.all():
+            for date in dates:
+                tickets_with_date.append(
+                    TicketWithDate(
+                        ticket.id,
+                        ticket.name,
+                        ticket.type,
+                        ticket.price,
+                        ticket.personas,
+                        date
+                    )
+                )
+
+        return Response(
+            list(map(dataclasses.asdict, tickets_with_date)),
+            status=status.HTTP_200_OK
+        )

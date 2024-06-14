@@ -7,6 +7,7 @@ from .views import (
     CartRetrieveUpdateAPIView,
     EventsAvailableApiView,
     PlacesAvailableApiView,
+    TicketsAvailableApiView,
 )
 
 urlpatterns = [
@@ -21,5 +22,10 @@ urlpatterns = [
         "places/<int:pk>/events/available/",
         EventsAvailableApiView.as_view(),
         name="events-available",
+    ),
+    path(
+        "events/<int:pk>/tickets/available/",
+        TicketsAvailableApiView.as_view(),
+        name="tickets-available",
     ),
 ]

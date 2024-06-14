@@ -17,6 +17,16 @@ class EventWithDate:
     end_datetime: datetime
 
 
+@dataclasses.dataclass
+class TicketWithDate:
+    id: int
+    name: str
+    type: str
+    price: int
+    personas: int
+    time: datetime
+
+
 class EventWithDateSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     place_id = serializers.IntegerField()
