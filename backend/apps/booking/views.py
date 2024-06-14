@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from rest_framework import generics, status
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .dto import EventWithDateSerializer, EventWithDate
@@ -63,8 +65,17 @@ class PlacesAvailableApiView(APIView):
 
 
 class EventsAvailableApiView(APIView):
-    serializer_class = EventWithDateSerializer
-
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'start_datetime', openapi.IN_QUERY, description="start datetime",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'end_datetime', openapi.IN_QUERY, description="end datetime",
+                type=openapi.TYPE_STRING
+            )
+        ])
     def get(self, request, pk):
         events_queryset = Event.objects.filter(place_id=pk).all()
         try:
@@ -79,6 +90,7 @@ class EventsAvailableApiView(APIView):
         events_with_date: list[EventWithDate] = []
         for event in events_queryset:
             cal = event.icalendar()
+            print(event)
             events = rec_ical.of(cal).between(start_datetime, end_datetime)
 
             for e in events:
@@ -96,5 +108,5 @@ class EventsAvailableApiView(APIView):
                 e.capacity -= Booking.objects.filter(
                     event_id=e.id, time=e.start_datetime
                 ).count()
-        serializer = self.serializer_class(events_with_date, many=True)
+        serializer = EventWithDateSerializer(events_with_date, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
