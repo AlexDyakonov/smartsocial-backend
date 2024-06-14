@@ -27,7 +27,7 @@ class CartTicketAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ("id", "event", "ticket", "time", "cart")
+    list_display = ("id", "event", "ticket", "time", "cart", "file")
     list_filter = ("time",)
     search_fields = ("id",)
     readonly_fields = ("id",)

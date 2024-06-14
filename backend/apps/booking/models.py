@@ -36,3 +36,4 @@ class Booking(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     time = models.DateTimeField()
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    file = models.FileField(upload_to="tickets/", null=True, blank=True)

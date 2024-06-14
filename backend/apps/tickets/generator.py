@@ -1,4 +1,8 @@
+import os
+
 import qrcode
+from apps.booking.models import Booking
+from django.core.files import File
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
@@ -33,8 +37,12 @@ def create_ticket_template(ticket_info, output_file):
     width, height = A4
 
     # Регистрация шрифтов
-    pdfmetrics.registerFont(TTFont("Myriad", "./fonts/MyriadPro-Regular.ttf"))
-    pdfmetrics.registerFont(TTFont("Myriad-Bold", "fonts/MyriadPro-Bold.ttf"))
+    pdfmetrics.registerFont(
+        TTFont("Myriad", "/usr/local/share/fonts/MyriadPro-Regular.ttf")
+    )
+    pdfmetrics.registerFont(
+        TTFont("Myriad-Bold", "/usr/local/share/fonts/MyriadPro-Bold.ttf")
+    )
 
     # Заголовок билета
     c.setFont("Myriad-Bold", 18)
@@ -88,3 +96,11 @@ def create_ticket_template(ticket_info, output_file):
     # Завершение и сохранение PDF
     c.showPage()
     c.save()
+
+    # TODO FIX
+    booking = Booking.objects.get(pk=1)
+
+    with open(output_file, "rb") as f:
+        booking.file.save(output_file, File(f))
+
+    booking.save()
