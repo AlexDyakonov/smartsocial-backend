@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from .generator import create_ticket_template
 
 
-class AddFileToBooking(APIView):
+class AddFileToOrder(APIView):
     def get(self, request):
         ticket_info = {
             "buyer_name": "Иван Иванов",

@@ -1,7 +1,7 @@
 import os
 
 import qrcode
-from apps.booking.models import Booking
+from apps.payments.models import Order
 from django.core.files import File
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
@@ -98,9 +98,9 @@ def create_ticket_template(ticket_info, output_file):
     c.save()
 
     # TODO FIX
-    booking = Booking.objects.get(pk=1)
+    order = Order.objects.get(payment_id="2dfd28ac-000f-5000-a000-1a776437c021")
 
     with open(output_file, "rb") as f:
-        booking.file.save(output_file, File(f))
+        order.ticket_file.save(output_file, File(f))
 
-    booking.save()
+    order.save()
