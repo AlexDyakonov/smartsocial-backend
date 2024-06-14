@@ -2,28 +2,35 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .generator import create_ticket_template
+from .generator import generate_ticket
+from .serializers import OrderPaymentIdSerializer
+from .utils import get_ticket_info
 
 
-class AddFileToOrder(APIView):
-    def get(self, request):
-        ticket_info = {
-            "buyer_name": "Иван Иванов",
-            "total_cost": 500,
-            "seat_count": 4,
-            "qr_data": "https://example.com/validate_ticket?id=123456",
-            "tickets": [
-                {
-                    "ticket_number": 3,
-                    "place_name": "Название места 3",
-                    "event_name": "Мероприятие 1",
-                    "date": "Дата 1",
-                    "time": "Время 1",
-                    "cost": "Бесплатно",
-                    "ticket_type": "Детский",
-                },
-            ],
-        }
+class CreateTicket(generics.CreateAPIView):
+    serializer_class = OrderPaymentIdSerializer
 
-        create_ticket_template(ticket_info, "ticket_template.pdf")
-        return Response(status=status.HTTP_200_OK)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            order_id = serializer.validated_data.get("order_id")
+
+            ticket_info = get_ticket_info(order_id)
+            if not ticket_info:
+                return Response(
+                    {"error": "Error fetching ticket info"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            if generate_ticket(ticket_info, order_id):
+                return Response(
+                    {"ticket_url": "kolomnago.ru"}, status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": "Error creating ticket"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

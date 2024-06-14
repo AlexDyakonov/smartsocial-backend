@@ -32,69 +32,88 @@ def check_page_space(y_position, c, height):
     return y_position
 
 
-def create_ticket_template(ticket_info):
-    output_file = ticket_info["output_file"]
+def generate_ticket(ticket_info, order_id):
+    try:
+        output_file = f"{ticket_info['output_file']}.pdf"
 
-    c = canvas.Canvas(output_file, pagesize=A4)
-    width, height = A4
+        c = canvas.Canvas(output_file, pagesize=A4)
+        width, height = A4
 
-    # Регистрация шрифтов
-    pdfmetrics.registerFont(
-        TTFont("Myriad", "/usr/local/share/fonts/MyriadPro-Regular.ttf")
-    )
-    pdfmetrics.registerFont(
-        TTFont("Myriad-Bold", "/usr/local/share/fonts/MyriadPro-Bold.ttf")
-    )
-
-    # Заголовок билета
-    c.setFont("Myriad-Bold", 18)
-    c.drawString(30, height - 50, "Единый билет")
-    y_position = height - 70
-
-    # Основная информация о билете
-    c.setFont("Myriad", 12)
-    c.drawString(30, y_position, f"Покупатель: {ticket_info['buyer_name']}")
-    c.drawString(
-        30, y_position - 20, f"Общая стоимость: {ticket_info['total_cost']} руб"
-    )
-    c.drawString(30, y_position - 40, f"Количество мест: {ticket_info['seat_count']}")
-    y_position -= 60
-
-    # Генерация и вставка QR-кода
-    qr_code_path = "qrcode.png"
-    generate_qr_code(ticket_info["qr_data"], qr_code_path)
-    c.drawImage(qr_code_path, width - 120, height - 120, width=100, height=100)
-
-    # Линия под основную информацию
-    c.line(30, y_position, width - 30, y_position)
-    y_position -= 20
-
-    # Информация о каждом билете
-    for ticket in ticket_info["tickets"]:
-        y_position = check_page_space(y_position, c, height)
-        c.setFont("Myriad-Bold", 12)
-        c.drawString(
-            30, y_position, f"Билет {ticket['ticket_number']} - {ticket['place_name']}"
+        # Регистрация шрифтов
+        pdfmetrics.registerFont(
+            TTFont("Myriad", "/usr/local/share/fonts/MyriadPro-Regular.ttf")
         )
-        y_position -= 20
+        pdfmetrics.registerFont(
+            TTFont("Myriad-Bold", "/usr/local/share/fonts/MyriadPro-Bold.ttf")
+        )
+
+        # Заголовок билета
+        c.setFont("Myriad-Bold", 18)
+        c.drawString(30, height - 50, "Единый билет")
+        y_position = height - 70
+
+        # Основная информация о билете
         c.setFont("Myriad", 12)
+        c.drawString(30, y_position, f"Покупатель: {ticket_info['buyer_name']}")
         c.drawString(
-            30,
-            y_position,
-            f"{ticket['event_name']} - {ticket['date']}, {ticket['time']}",
+            30, y_position - 20, f"Общая стоимость: {ticket_info['total_cost']} руб"
         )
-        y_position -= 20
-        c.drawString(30, y_position, f"Стоимость - {ticket['cost']}")
-        y_position -= 20
-        c.drawString(30, y_position, f"Тип билета - {ticket['ticket_type']}")
-        y_position -= 20
+        c.drawString(
+            30, y_position - 40, f"Количество мест: {ticket_info['total_places']}"
+        )
+        y_position -= 60
+
+        # Генерация и вставка QR-кода
+        qr_code_path = "qrcode.png"
+        generate_qr_code(ticket_info["qr_data"], qr_code_path)
+        c.drawImage(qr_code_path, width - 120, height - 120, width=100, height=100)
+
+        # Линия под основную информацию
         c.line(30, y_position, width - 30, y_position)
         y_position -= 20
 
-    # Информация о сервисе
-    c.setFont("Myriad", 8)
-    c.drawString(30, y_position, "Информация о сервисе мелким шрифтом")
+        # Информация о каждом билете
+        for ticket in ticket_info["tickets"]:
+            y_position = check_page_space(y_position, c, height)
+            c.setFont("Myriad-Bold", 12)
+            c.drawString(
+                30,
+                y_position,
+                f"Билет {ticket['ticket_number']} - {ticket['place_name']}",
+            )
+            y_position -= 20
+            c.setFont("Myriad", 12)
+            c.drawString(
+                30,
+                y_position,
+                f"{ticket['event_name']} - {ticket['date']}, {ticket['time']}",
+            )
+            y_position -= 20
+            c.drawString(30, y_position, f"Стоимость - {ticket['cost']}")
+            y_position -= 20
+            c.drawString(30, y_position, f"Тип билета - {ticket['ticket_type']}")
+            y_position -= 20
+            c.line(30, y_position, width - 30, y_position)
+            y_position -= 20
 
-    # Завершение и сохранение PDF
-    c.showPage()
-    c.save()
+        c.setFont("Myriad", 8)
+        c.drawString(30, y_position, "Информация о сервисе мелким шрифтом")
+
+        c.showPage()
+        c.save()
+
+        order = Order.objects.filter(payment_id=order_id).first()
+
+        with open(output_file, "rb") as f:
+            order.ticket_file.save(output_file, File(f))
+
+        order.save()
+
+        os.remove(qr_code_path)
+        os.remove(output_file)
+
+        return True
+
+    except Exception as e:
+        print(f"Error creating ticket: {e}")
+        return False
