@@ -15,7 +15,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = os.getenv("DEBUG_MODE", "True") == "True"
 
-
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split() or []
 
 CSRF_TRUSTED_ORIGINS = []
@@ -30,7 +29,6 @@ cors_allow_headers = os.getenv("CORS_ALLOW_HEADERS")
 CORS_ALLOW_HEADERS = cors_allow_headers.split(",") if cors_allow_headers else ["*"]
 CORS_ORIGIN_ALLOW_ALL = os.getenv("CORS_ORIGIN_ALLOW_ALL", "False") == "True"
 CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "False") == "True"
-
 
 # Application definition
 INSTALLED_APPS = [
@@ -56,6 +54,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.booking",
     "apps.payments",
+    "apps.amo",
 ]
 
 # User model
@@ -214,6 +213,8 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 YOOKASSA_ACCOUNT_ID = os.getenv("YOOKASSA_ACCOUNT_ID")
 YOOKASSA_SECRET_KEY = os.getenv("YOOKASSA_SECRET_KEY")
 
+# AMORCM
+AMOCRM_ACCESS_TOKEN = os.getenv("AMOCRM_ACCESS_TOKEN")
 
 # Logging
 LOGGING = {
