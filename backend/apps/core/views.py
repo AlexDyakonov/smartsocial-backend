@@ -1,15 +1,11 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.views import APIView, Response
-from rest_framework import status
-from .models import (
-    Event,
-    Place,
-    Ticket,
-)
+
+from .models import Event, Place, Ticket
 from .serializers import (
+    EventSerializer,
     PlaceInputSerializer,
     PlaceOutputSerializer,
-    EventSerializer,
     TicketSerializer,
 )
 
@@ -19,7 +15,7 @@ class PlaceListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = PlaceOutputSerializer
 
     def get_serializer_class(self):
-        if self.request.method == 'POST':
+        if self.request.method == "POST":
             return PlaceInputSerializer
         return PlaceOutputSerializer
 
@@ -29,7 +25,7 @@ class PlaceRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PlaceOutputSerializer
 
     def get_serializer_class(self):
-        if self.request.method == 'PUT' or self.request.method == 'PATCH':
+        if self.request.method in ["PUT", "PATCH"]:
             return PlaceInputSerializer
         return PlaceOutputSerializer
 
@@ -49,7 +45,9 @@ class EventTicketsAPIView(APIView):
 
     def get(self, request, pk):
         tickets = Event.objects.filter(pk=pk).first().tickets.all()
-        return Response(self.serializer_class(tickets, many=True).data, status.HTTP_200_OK)
+        return Response(
+            self.serializer_class(tickets, many=True).data, status.HTTP_200_OK
+        )
 
 
 class TicketListCreateAPIView(generics.ListCreateAPIView):
