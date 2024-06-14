@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import AddFileToOrder
+from .views import CreateTicket
 
 urlpatterns = [
-    path("create", AddFileToOrder.as_view()),
+    path("generate", CreateTicket.as_view()),
 ]
