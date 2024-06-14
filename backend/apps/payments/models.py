@@ -9,6 +9,7 @@ class Order(models.Model):
     return_url = models.TextField(null=True, blank=True)
     confirmation_token = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    ticket_file = models.FileField(upload_to="tickets/", null=True, blank=True)
 
     PAYMENT_STATUS_CHOICES = [
         ("pending", "Ожидание оплаты"),

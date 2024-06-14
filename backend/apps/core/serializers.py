@@ -1,7 +1,7 @@
 import django.contrib.gis.geos as geos
 from rest_framework import serializers
 
-from .models import Event, Place, Ticket
+from .models import Event, Image, Place, Ticket
 
 
 class PointField(serializers.Field):
@@ -17,16 +17,23 @@ class PointField(serializers.Field):
             raise serializers.ValidationError("Invalid input for a Point instance.")
 
 
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ("image",)
+
+
 class PlaceInputSerializer(serializers.ModelSerializer):
     location = PointField()
 
     class Meta:
         model = Place
-        fields = ("name", "description", "address", "location", "images")
+        fields = ("name", "description", "address", "location")
 
 
 class PlaceOutputSerializer(serializers.ModelSerializer):
     location = PointField()
+    images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Place

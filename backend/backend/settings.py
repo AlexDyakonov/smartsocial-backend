@@ -141,20 +141,30 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# Настройки для хранилища Selectel
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+AWS_S3_REGION_NAME = os.getenv("AWS_STORAGE_REGION_NAME")
+AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
+
+DEFAULT_FILE_STORAGE = "backend.storage_backends.MediaStorage"
+
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 STATIC_URL = "/api/v1/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-MEDIA_URL = "/api/v1/media/"
+MEDIA_URL = f"https://{os.getenv('AWS_S3_CUSTOM_DOMAIN')}/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/staticfiles')]
 
 # Static file storage
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = True

@@ -24,5 +24,8 @@ RUN pip install -r requirements.txt
 RUN pip install gunicorn
 
 COPY . .
+COPY ./docker/assets/fonts/MyriadPro-Bold.ttf /usr/local/share/fonts/MyriadPro-Bold.ttf
+COPY ./docker/assets/fonts/MyriadPro-Regular.ttf /usr/local/share/fonts/MyriadPro-Regular.ttf
+
 
 RUN ["chmod", "+x", "./docker/run.sh"]
