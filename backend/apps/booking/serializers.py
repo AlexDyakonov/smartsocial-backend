@@ -73,4 +73,4 @@ class BuyerSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = ("id", "event", "ticket", "time", "visited")
+        fields = ("id", "event", "ticket", "time", "visited", "quantity")

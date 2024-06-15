@@ -104,7 +104,7 @@ def group_bookings_by_place_event_time(order):
     print(bookings)
     for booking in bookings:
         key = (booking.event.place.name, booking.event.name, booking.time)
-        grouped_data[key]['types'][booking.ticket.get_type_display()] += 1
+        grouped_data[key]['types'][booking.ticket.get_type_display()] = booking.quantity
         grouped_data[key]['price'] += int(booking.ticket.price)
 
     return [

@@ -33,11 +33,11 @@ class Order(models.Model):
 def create_bookings(sender, instance, **kwargs):
     print(instance.cart.tickets.all())
     for t in instance.cart.tickets.all():
-        for _ in range(t.quantity):
-            Booking.objects.create(
-                event=t.event,
-                ticket=t.ticket,
-                time=t.time,
-                cart=t.cart
-            )
+        Booking.objects.create(
+            event=t.event,
+            ticket=t.ticket,
+            time=t.time,
+            cart=t.cart,
+            quantity=t.quantity
+        )
     post_orders([instance])

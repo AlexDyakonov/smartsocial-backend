@@ -43,3 +43,4 @@ class Booking(models.Model):
     time = models.DateTimeField()
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     visited = models.BooleanField(default=False)
+    quantity = models.IntegerField(validators=[MinValueValidator(0)])
