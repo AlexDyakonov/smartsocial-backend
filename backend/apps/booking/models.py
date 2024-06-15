@@ -1,10 +1,11 @@
 from apps.core.models import Event, Ticket
+from django.core.validators import EmailValidator, MinValueValidator
 from django.db import models
 from django.db.models import Count, F, Sum
 
 
 class Buyer(models.Model):
-    email = models.EmailField()
+    email = models.EmailField(validators=[EmailValidator()])
     phone = models.CharField(max_length=255)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -32,7 +33,7 @@ class CartTicket(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="tickets")
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     time = models.DateTimeField()
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(validators=[MinValueValidator(0)])
 
 
 class Booking(models.Model):
