@@ -10,21 +10,24 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, status
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Order
-from .serializers import PaymentProcessingSerializer, PaymentStatusSerializer
+from .serializers import (
+    PaymentListOutputSerializer,
+    PaymentProcessingSerializer,
+    PaymentStatusSerializer,
+)
 from .services import YooKassaService
 
 
-@api_view(["POST"])
-def send_purchase_email_view(request):
-    email = "shram.monolit@mail.ru"
-    order_id = "2dff10a2-000f-5000-8000-1dd9e1fd9832"
-    send_purchase_email(email, order_id)
-    return Response({"status": "Email is being sent."})
+class PaymentListView(generics.ListAPIView):
+    serializer_class = PaymentListOutputSerializer
+    queryset = Order.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 
 class PaymentStatusView(generics.RetrieveAPIView):
