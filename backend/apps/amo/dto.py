@@ -26,10 +26,17 @@ class BookingDTO:
 DEAL_BOUGHT_TICKETS = "Купленные билеты"
 
 
+def display_types(types) -> str:
+    s = ""
+    for key, val in types.items():
+        s += key + ":" + str(val) + " "
+    return s
+
+
 def booking_to_string(b: BookingDTO) -> str:
-    return b.place_name + " |" \
-        + b.event_name + " |" \
-        + json.dumps(b.types) + " |" \
+    return b.place_name + " | " \
+        + b.event_name + " | " \
+        + display_types(b.types) + "| " \
         + str(b.price) + " | " \
         + b.time.strftime("%d.%m %H:%M")
 
@@ -62,8 +69,8 @@ def group_bookings_by_place_event_time(order):
     print(bookings)
     for booking in bookings:
         key = (booking.event.place.name, booking.event.name, booking.time)
-        grouped_data[key]['types'][booking.ticket.type] += booking
-        grouped_data[key]['price'] += booking.ticket.price
+        grouped_data[key]['types'][booking.ticket.get_type_display()] += 1
+        grouped_data[key]['price'] += int(booking.ticket.price)
     print(grouped_data)
     return [
         BookingDTO(

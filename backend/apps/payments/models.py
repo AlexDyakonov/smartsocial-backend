@@ -1,5 +1,8 @@
 from apps.booking.models import Cart
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from apps.booking.models import Booking
 
 
 class Order(models.Model):
@@ -23,3 +26,16 @@ class Order(models.Model):
         choices=PAYMENT_STATUS_CHOICES,
         default="pending",
     )
+
+
+@receiver(post_save, sender=Order)
+def create_bookings(sender, instance, **kwargs):
+    print(instance.cart.tickets.all())
+    for t in instance.cart.tickets.all():
+        for _ in range(t.quantity):
+            Booking.objects.create(
+                event=t.event,
+                ticket=t.ticket,
+                time=t.time,
+                cart=t.cart
+            )

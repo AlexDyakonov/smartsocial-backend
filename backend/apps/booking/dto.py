@@ -1,9 +1,6 @@
 import dataclasses
 from datetime import datetime
 from rest_framework import serializers
-from .serializers import TicketSerializer
-
-from .models import Ticket
 
 
 @dataclasses.dataclass

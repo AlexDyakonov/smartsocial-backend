@@ -1,84 +1,67 @@
-from apps.core.models import Ticket, Event
-from apps.core.serializers import TicketSerializer, EventSerializer
-from rest_framework import serializers
+from datetime import datetime
 
 from .models import Buyer, Cart, CartTicket
 
+from rest_framework import serializers
 
-class CartTicketInputSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
-    price = serializers.SerializerMethodField()
-    personas = serializers.SerializerMethodField()
-    id = serializers.IntegerField(source='ticket.id', read_only=True)
-    event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
-    event_name = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = CartTicket
-        fields = ("ticket", "time", "quantity", "name", "type", "price", "personas", "id", "event", "event_name")
-
-    def get_name(self, obj):
-        return obj.ticket.name
-
-    def get_event_id(self, obj: CartTicket):
-        return obj.ticket
-
-    def get_event_name(self, obj):
-        return obj.event.name
-
-    def get_type(self, obj):
-        return obj.ticket.type
-
-    def get_price(self, obj):
-        return obj.ticket.price
-
-    def get_personas(self, obj):
-        return obj.ticket.personas
+from apps.core.models import Ticket, Event
 
 
-class CartTicketOutputSerializer(serializers.ModelSerializer):
-    ticket = TicketSerializer(many=False)
-    event = EventSerializer(many=False)
+class CartTicketSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='ticket.name', read_only=True)
+    type = serializers.CharField(source='ticket.type', read_only=True)
+    price = serializers.DecimalField(source='ticket.price', max_digits=10, decimal_places=2, read_only=True)
+    personas = serializers.IntegerField(source='ticket.personas', read_only=True)
+    event_name = serializers.CharField(source='event.name', read_only=True)
+
+    event_id = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
+    ticket_id = serializers.PrimaryKeyRelatedField(queryset=Ticket.objects.all())
 
     class Meta:
         model = CartTicket
-        fields = ("id", "ticket", "time", "quantity", "event")
+        fields = ['ticket_id', 'name', 'type', 'price', 'personas', 'event_id', 'event_name', 'quantity',
+                  'time']
 
 
-class CartInputSerializer(serializers.ModelSerializer):
-    tickets = CartTicketInputSerializer(many=True)
-    buyer = serializers.PrimaryKeyRelatedField(
-        queryset=Buyer.objects.all(), required=False, allow_null=True
-    )
+class CartSerializer(serializers.ModelSerializer):
+    tickets = CartTicketSerializer(many=True)
 
     class Meta:
         model = Cart
-        fields = ("id", "buyer", "tickets")
+        fields = ("id", "created_at", "tickets")
 
     def create(self, validated_data):
-        tickets_data = validated_data.pop("tickets")
+        tickets_data = validated_data.pop('tickets')
         cart = Cart.objects.create(**validated_data)
         for ticket_data in tickets_data:
-            CartTicket.objects.create(cart=cart, **ticket_data)
+            CartTicket.objects.create(
+                cart=cart,
+                ticket=ticket_data.get('ticket_id'),
+                event=ticket_data.get('event_id'),
+                time=ticket_data.get('time'),
+                quantity=ticket_data.get('quantity'),
+            )
         return cart
 
     def update(self, instance, validated_data):
-        tickets_data = validated_data.pop("tickets", [])
-        CartTicket.objects.filter(cart=instance).delete()
+        tickets_data = validated_data.pop('tickets')
+        instance.buyer = validated_data.get('buyer', instance.buyer)
+        instance.save()
+
         for ticket_data in tickets_data:
-            CartTicket.objects.create(cart=instance, **ticket_data)
+            ticket_id = ticket_data.get('ticket').id
+            event_id = ticket_data.get('event').id
+            CartTicket.objects.update_or_create(
+                cart=instance,
+                ticket_id=ticket_id,
+                event_id=event_id,
+                defaults={
+                    'quantity': ticket_data.get('quantity', 0),
+                    'time': ticket_data.get('time')
+                }
+            )
+
         return instance
-
-
-class CartOutputSerializer(serializers.ModelSerializer):
-    buyer = serializers.PrimaryKeyRelatedField(read_only=True)
-    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
-    tickets = CartTicketOutputSerializer(many=True)
-
-    class Meta:
-        model = Cart
-        fields = ("id", "buyer", "created_at", "tickets")
 
 
 class BuyerSerializer(serializers.ModelSerializer):

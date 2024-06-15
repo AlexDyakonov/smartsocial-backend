@@ -1,5 +1,4 @@
 import dataclasses
-import json
 from datetime import datetime
 
 from rest_framework import generics, status
@@ -16,30 +15,19 @@ from apps.core.serializers import PlaceOutputSerializer
 import recurring_ical_events as rec_ical
 
 from .serializers import (
-    CartInputSerializer,
-    CartOutputSerializer,
+    CartSerializer,
     BuyerSerializer,
 )
 
 
 class CartListCreateAPIView(generics.ListCreateAPIView):
     queryset = Cart.objects.all()
-    serializer_class = CartOutputSerializer
-
-    def get_serializer_class(self):
-        if self.request.method == "POST":
-            return CartInputSerializer
-        return CartOutputSerializer
+    serializer_class = CartSerializer
 
 
 class CartRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     queryset = Cart.objects.all()
-    serializer_class = CartOutputSerializer
-
-    def get_serializer_class(self):
-        if self.request.method == "PUT" or self.request.method == "PATCH":
-            return CartInputSerializer
-        return CartOutputSerializer
+    serializer_class = CartSerializer
 
 
 class BuyerListCreateAPIView(generics.ListCreateAPIView):
