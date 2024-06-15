@@ -13,6 +13,10 @@ class ContactDTO:
     phone: str
 
 
+UNPAY_STATUS = 67507838
+PAY_STATUS = 67507834
+
+
 @dataclasses.dataclass
 class DealDTO:
     name: str
@@ -20,6 +24,7 @@ class DealDTO:
     bought_tickets: str
     created_at: datetime
     contact: ContactDTO
+    status_id: int
 
 
 @dataclasses.dataclass
@@ -54,6 +59,7 @@ def deal_to_json(deal: DealDTO) -> {}:
     return {
         "name": deal.name,
         "price": deal.price,
+        "pipeline_id": deal.price,
         "created_at": int(deal.created_at.astimezone().timestamp()),
         "custom_fields_values": [
             {"field_id": d_f_id[DEAL_BOUGHT_TICKETS], "values": [{"value": deal.bought_tickets}]},
@@ -75,17 +81,20 @@ def deal_to_json(deal: DealDTO) -> {}:
 
 def order_to_deal(order) -> DealDTO:
     bookings = group_bookings_by_place_event_time(order)
+    status = PAY_STATUS if (order.payment_status == "succeeded") else UNPAY_STATUS
+
     return DealDTO(
         order.cart.buyer.first_name + " " + order.cart.buyer.last_name + " " + datetime.now().strftime("%d.%m"),
         int(order.total),
         "\n\n".join(list(map(booking_to_string, bookings))),
         datetime.now(),
-        contact=ContactDTO(
+        ContactDTO(
             first_name=order.cart.buyer.first_name,
             last_name=order.cart.buyer.last_name,
             email=order.cart.buyer.email,
             phone=order.cart.buyer.phone,
-        )
+        ),
+        status
     )
 
 

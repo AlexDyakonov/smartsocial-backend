@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 from .models import Order
 from .serializers import PaymentProcessingSerializer, PaymentStatusSerializer
 from .services import YooKassaService
+from apps.amo.views import post_orders
 
 
 @api_view(["POST"])
@@ -165,6 +166,7 @@ def yookassa_webhook(request):
                     order = Order.objects.filter(payment_id=payment_id).first()
                     order.payment_status = status
                     order.save()
+                    post_orders([order])
 
                     if generate_ticket(get_ticket_info(payment_id), payment_id):
                         send_purchase_email(order.cart.buyer.email, payment_id)
