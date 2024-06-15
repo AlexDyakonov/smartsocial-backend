@@ -11,6 +11,7 @@ from .models import Cart, Buyer
 from apps.core.models import Place, Event
 from apps.booking.models import Booking
 from apps.core.serializers import PlaceOutputSerializer
+import dateutil.parser
 
 import recurring_ical_events as rec_ical
 
@@ -68,8 +69,8 @@ class EventsAvailableApiView(APIView):
         ])
     def get(self, request, pk):
         try:
-            start_datetime = datetime.fromisoformat(request.query_params.get('start_datetime'))
-            end_datetime = datetime.fromisoformat(request.query_params.get('end_datetime'))
+            start_datetime = dateutil.parser.isoparse(request.query_params.get('start_datetime'))
+            end_datetime = dateutil.parser.isoparse(request.query_params.get('end_datetime'))
         except ValueError:
             return Response(
                 {"error": "Invalid date format. Use ISO 8601 format: YYYY-MM-DDTHH:MM:SS"},
@@ -115,8 +116,8 @@ class TicketsAvailableApiView(APIView):
         ])
     def get(self, request, pk):
         try:
-            start_datetime = datetime.fromisoformat(request.query_params.get('start_datetime'))
-            end_datetime = datetime.fromisoformat(request.query_params.get('end_datetime'))
+            start_datetime = dateutil.parser.isoparse(request.query_params.get('start_datetime'))
+            end_datetime = dateutil.parser.isoparse(request.query_params.get('end_datetime'))
         except ValueError:
             return Response(
                 {"error": "Invalid date format. Use ISO 8601 format: YYYY-MM-DDTHH:MM:SS"},
@@ -130,7 +131,6 @@ class TicketsAvailableApiView(APIView):
         dates = []
         for e in events:
             dates.append(e["DTSTART"].dt)
-
         tickets_with_date: list[TicketWithDate] = []
         for ticket in event.tickets.all():
             for date in dates:
