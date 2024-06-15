@@ -1,4 +1,4 @@
-from .utils import get_custom_fields_to_id
+from .utils import get_custom_fields_to_id, get_statuses_to_id
 
 DEAL_FIELD_TO_ID = get_custom_fields_to_id(
     "https://forvantar.amocrm.ru/api/v4/leads/custom_fields"
@@ -6,3 +6,4 @@ DEAL_FIELD_TO_ID = get_custom_fields_to_id(
 CONTACT_FIELD_TO_ID = get_custom_fields_to_id(
     "https://forvantar.amocrm.ru/api/v4/contacts/custom_fields"
 )
+PIPELINE_FIELD_TO_ID = get_statuses_to_id()

@@ -188,7 +188,7 @@ def yookassa_webhook(request):
 
 
 class BookingsByOrderIdAPIView(APIView):
-    def get(self, request, id: str):
-        order: Order = Order.objects.filter(payment_id=id).first()
+    def get(self, request, payment_id: str):
+        order: Order = Order.objects.filter(payment_id=payment_id).first()
         bookings = Booking.objects.filter(cart=order.cart).all()
         return Response(BookingSerializer(bookings, many=True).data, status.HTTP_200_OK)

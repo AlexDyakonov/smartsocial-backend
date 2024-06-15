@@ -1,6 +1,6 @@
 import dataclasses
 from datetime import datetime
-from . import DEAL_FIELD_TO_ID, CONTACT_FIELD_TO_ID
+from . import DEAL_FIELD_TO_ID, CONTACT_FIELD_TO_ID, PIPELINE_FIELD_TO_ID
 from apps.booking.models import Booking
 from collections import defaultdict
 
@@ -13,12 +13,9 @@ class ContactDTO:
     phone: str
 
 
-UNPAY_STATUS = 67507838
-PAY_STATUS = 67507834
-
-
 @dataclasses.dataclass
 class DealDTO:
+    payment_id: str
     name: str
     price: int
     bought_tickets: str
@@ -59,10 +56,11 @@ def deal_to_json(deal: DealDTO) -> {}:
     return {
         "name": deal.name,
         "price": deal.price,
-        "pipeline_id": deal.price,
+        "status_id": deal.status_id,
         "created_at": int(deal.created_at.astimezone().timestamp()),
         "custom_fields_values": [
             {"field_id": d_f_id[DEAL_BOUGHT_TICKETS], "values": [{"value": deal.bought_tickets}]},
+            {"field_id": d_f_id["ID заказа"], "values": [{"value": deal.bought_tickets}]},
         ],
         "_embedded": {
             "contacts": [
@@ -80,10 +78,13 @@ def deal_to_json(deal: DealDTO) -> {}:
 
 
 def order_to_deal(order) -> DealDTO:
+    print(order)
     bookings = group_bookings_by_place_event_time(order)
-    status = PAY_STATUS if (order.payment_status == "succeeded") else UNPAY_STATUS
+    p_f_id = PIPELINE_FIELD_TO_ID
+    status = p_f_id["оплачен"] if (order.payment_status == "succeeded") else p_f_id["не оплачен"]
 
     return DealDTO(
+        order.payment_id,
         order.cart.buyer.first_name + " " + order.cart.buyer.last_name + " " + datetime.now().strftime("%d.%m"),
         int(order.total),
         "\n\n".join(list(map(booking_to_string, bookings))),
