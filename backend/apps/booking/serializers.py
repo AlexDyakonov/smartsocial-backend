@@ -5,6 +5,7 @@ from .models import Buyer, Cart, CartTicket, Booking
 from rest_framework import serializers
 
 from apps.core.models import Ticket, Event
+from apps.core.serializers import TicketSerializer
 
 
 class CartTicketSerializer(serializers.ModelSerializer):
@@ -71,6 +72,8 @@ class BuyerSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    ticket = TicketSerializer(many=False, read_only=True)
+
     class Meta:
         model = Booking
         fields = ("id", "event", "ticket", "time", "visited", "quantity")
