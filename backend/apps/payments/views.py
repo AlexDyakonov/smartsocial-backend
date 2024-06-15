@@ -1,6 +1,9 @@
 import json
 
 from apps.booking.models import Buyer, Cart
+from apps.payments.models import Order
+from apps.tickets.generator import generate_ticket
+from apps.tickets.utils import get_ticket_info
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -9,8 +12,39 @@ from rest_framework.response import Response
 from apps.amo.views import post_orders
 
 from .models import Order
-from .serializers import PaymentProcessingSerializer
+from .serializers import PaymentProcessingSerializer, PaymentStatusSerializer
 from .services import YooKassaService
+
+
+class PaymentStatusView(generics.RetrieveAPIView):
+    serializer_class = PaymentStatusSerializer
+
+    def get(self, request, *args, **kwargs):
+        payment_id = kwargs.get("payment_id")
+        order = Order.objects.filter(payment_id=payment_id).first()
+
+        if not order:
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        if order.payment_status == "succeeded" and order.ticket_file:
+            return Response(
+                {
+                    "payment_status": "succeeded",
+                    "ticket_url": f"{order.ticket_file.url}",
+                    "total": f"{order.total}",
+                },
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {
+                    "payment_status": order.payment_status,
+                    "total": f"{order.total}",
+                },
+                status=status.HTTP_200_OK,
+            )
 
 
 class PaymentProcessingView(generics.GenericAPIView):
@@ -22,7 +56,6 @@ class PaymentProcessingView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         cart_id = serializer.validated_data.get("cart_id")
-        return_url = serializer.validated_data.get("return_url")
         buyer_data = serializer.validated_data.get("buyer")
 
         cart = Cart.objects.filter(id=cart_id).first()
@@ -59,7 +92,6 @@ class PaymentProcessingView(generics.GenericAPIView):
                     "payment_status": existing_order.payment_status,
                     "confirmation_token": existing_order.confirmation_token,
                     "payment_id": existing_order.payment_id,
-                    "return_url": existing_order.return_url,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -84,7 +116,6 @@ class PaymentProcessingView(generics.GenericAPIView):
                         cart=cart,
                         total=cart.total,
                         payment_id=payment_id,
-                        return_url=return_url,
                         confirmation_token=confirmation_token,
                         payment_status=payment_status,
                     )
@@ -100,7 +131,6 @@ class PaymentProcessingView(generics.GenericAPIView):
                     "confirmation_token": confirmation_token,
                     "payment_id": payment_id,
                     "payment_status": payment_status,
-                    "return_url": return_url,
                     "cart_id": cart_id,
                     "order_id": order.id,
                 },
@@ -123,10 +153,18 @@ def yookassa_webhook(request):
 
             if payment_id and status:
                 try:
-                    order = Order.objects.get(payment_id=payment_id)
+                    order = Order.objects.filter(payment_id=payment_id).first()
                     order.payment_status = status
                     order.save()
-                    return JsonResponse({"status": "success"}, status=200)
+
+                    if generate_ticket(get_ticket_info(payment_id), payment_id):
+                        return JsonResponse({"status": "success"}, status=200)
+                    else:
+                        return Response(
+                            {"error": "Error creating ticket"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        )
+
                 except Order.DoesNotExist:
                     return JsonResponse({"error": "Order not found"}, status=404)
             else:
