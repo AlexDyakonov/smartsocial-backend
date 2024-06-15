@@ -21,10 +21,10 @@ class Cart(models.Model):
     @property
     def total(self):
         return (
-            self.tickets.aggregate(total=Sum(F("ticket__price") * F("quantity")))[
-                "total"
-            ]
-            or 0
+                self.tickets.aggregate(total=Sum(F("ticket__price") * F("quantity")))[
+                    "total"
+                ]
+                or 0
         )
 
 
@@ -33,6 +33,7 @@ class CartTicket(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     time = models.DateTimeField()
     quantity = models.IntegerField()
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 
 class Booking(models.Model):

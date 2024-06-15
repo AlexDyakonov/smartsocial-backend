@@ -7,7 +7,7 @@ urlpatterns = [
     path("", include("apps.booking.urls")),
     path("tickets/", include("apps.tickets.urls")),
     path("payments/", include("apps.payments.urls")),
-    path("amo/", include("apps.amo.urls")),
+    # path("amo/", include("apps.amo.urls")),
     path("mailer/", include("apps.mailer.urls")),
     path("api/mailing-admin/", mailing_admin, name="mailing-admin"),
     path("api/mailing-admin/logout/", auth_views.LogoutView.as_view(), name="logout"),
