@@ -3,8 +3,7 @@ import requests
 from backend.settings import AMOCRM_ACCESS_TOKEN
 
 
-def get_field_to_id() -> dict[str, int]:
-    url = 'https://forvantar.amocrm.ru/api/v4/leads/custom_fields'
+def get_custom_fields_to_id(url) -> dict[str, int]:
     headers = {
         'Authorization': f'Bearer {AMOCRM_ACCESS_TOKEN}',
         'Content-Type': 'application/json'

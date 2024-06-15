@@ -27,7 +27,7 @@ def get_image_path(instance, filename):
 
 class Image(models.Model):
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=get_image_path)
+    src = models.ImageField(upload_to=get_image_path)
     caption = models.CharField(max_length=255, blank=True)
 
     def image_tag(self):

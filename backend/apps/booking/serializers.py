@@ -49,8 +49,8 @@ class CartSerializer(serializers.ModelSerializer):
         instance.save()
 
         for ticket_data in tickets_data:
-            ticket_id = ticket_data.get('ticket').id
-            event_id = ticket_data.get('event').id
+            ticket_id = ticket_data.get('ticket_id').id
+            event_id = ticket_data.get('event_id').id
             CartTicket.objects.update_or_create(
                 cart=instance,
                 ticket_id=ticket_id,

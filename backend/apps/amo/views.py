@@ -5,13 +5,13 @@ from backend.settings import AMOCRM_ACCESS_TOKEN
 
 
 def post_deals(deals: list[DealDTO]):
-    url = 'https://forvantar.amocrm.ru/api/v4/leads'
+    url = 'https://forvantar.amocrm.ru/api/v4/leads/complex'
     json_data = list(map(deal_to_json, deals))
     headers = {
         'Authorization': f'Bearer {AMOCRM_ACCESS_TOKEN}',
         'Content-Type': 'application/json'
     }
-    return requests.post(url, json=json_data, headers=headers)
+    print(requests.post(url, json=json_data, headers=headers).text)
 
 
 def post_orders(orders):

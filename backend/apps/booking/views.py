@@ -136,12 +136,14 @@ class TicketsAvailableApiView(APIView):
             for date in dates:
                 tickets_with_date.append(
                     TicketWithDate(
-                        ticket.id,
-                        ticket.name,
-                        ticket.type,
-                        ticket.price,
-                        ticket.personas,
-                        date
+                        ticket_id=ticket.id,
+                        event_id=event.id,
+                        event_name=event.name,
+                        name=ticket.name,
+                        type=ticket.type,
+                        price=ticket.price,
+                        personas=ticket.personas,
+                        time=date
                     )
                 )
 

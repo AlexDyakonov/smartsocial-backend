@@ -1,7 +1,6 @@
 import json
 
 from apps.booking.models import Buyer, Cart
-from apps.payments.models import Order
 from apps.tickets.generator import generate_ticket
 from apps.tickets.utils import get_ticket_info
 from django.db import transaction
@@ -9,7 +8,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, status
 from rest_framework.response import Response
-from apps.amo.views import post_orders
 
 from .models import Order
 from .serializers import PaymentProcessingSerializer, PaymentStatusSerializer
@@ -81,6 +79,7 @@ class PaymentProcessingView(generics.GenericAPIView):
         cart.buyer = buyer
         cart.save(update_fields=["buyer"])
 
+        # TODO better existing check
         existing_order = Order.objects.filter(
             cart_id=cart_id, payment_status="pending"
         ).first()
@@ -119,7 +118,6 @@ class PaymentProcessingView(generics.GenericAPIView):
                         confirmation_token=confirmation_token,
                         payment_status=payment_status,
                     )
-                post_orders([order])
             except Exception as e:
                 return Response(
                     {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -20,7 +20,7 @@ class PointField(serializers.Field):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ("image",)
+        fields = ("src",)
 
 
 class PlaceInputSerializer(serializers.ModelSerializer):
@@ -59,6 +59,8 @@ class EventSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    ticket_id = serializers.IntegerField(source="id")
+
     class Meta:
         model = Ticket
-        fields = ("id", "name", "type", "price", "place", "personas")
+        fields = ("ticket_id", "name", "type", "price", "place", "personas")

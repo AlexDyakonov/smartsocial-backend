@@ -16,7 +16,9 @@ class EventWithDate:
 
 @dataclasses.dataclass
 class TicketWithDate:
-    id: int
+    ticket_id: int
+    event_name: str
+    event_id: int
     name: str
     type: str
     price: int

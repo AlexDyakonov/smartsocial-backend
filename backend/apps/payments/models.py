@@ -1,3 +1,4 @@
+from apps.amo.views import post_orders
 from apps.booking.models import Cart
 from django.db import models
 from django.db.models.signals import post_save
@@ -39,3 +40,4 @@ def create_bookings(sender, instance, **kwargs):
                 time=t.time,
                 cart=t.cart
             )
+    post_orders([instance])

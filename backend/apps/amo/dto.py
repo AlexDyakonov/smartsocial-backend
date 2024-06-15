@@ -1,9 +1,16 @@
 import dataclasses
-import json
 from datetime import datetime
-from . import DEAL_FIELD_TO_ID
+from . import DEAL_FIELD_TO_ID, CONTACT_FIELD_TO_ID
 from apps.booking.models import Booking
 from collections import defaultdict
+
+
+@dataclasses.dataclass
+class ContactDTO:
+    first_name: str
+    last_name: str
+    email: str
+    phone: str
 
 
 @dataclasses.dataclass
@@ -12,6 +19,7 @@ class DealDTO:
     price: int
     bought_tickets: str
     created_at: datetime
+    contact: ContactDTO
 
 
 @dataclasses.dataclass
@@ -27,29 +35,41 @@ DEAL_BOUGHT_TICKETS = "Купленные билеты"
 
 
 def display_types(types) -> str:
-    s = ""
+    ss = []
     for key, val in types.items():
-        s += key + ":" + str(val) + " "
-    return s
+        ss.append(key + ": " + str(val))
+    return ", ".join(ss)
 
 
 def booking_to_string(b: BookingDTO) -> str:
-    return b.place_name + " | " \
-        + b.event_name + " | " \
-        + display_types(b.types) + "| " \
-        + str(b.price) + " | " \
+    return b.place_name + "\n" \
+        + b.event_name + "\n" \
+        + display_types(b.types) + "\n" \
         + b.time.strftime("%d.%m %H:%M")
 
 
 def deal_to_json(deal: DealDTO) -> {}:
-    f_id = DEAL_FIELD_TO_ID
+    d_f_id = DEAL_FIELD_TO_ID
+    c_f_id = CONTACT_FIELD_TO_ID
     return {
         "name": deal.name,
         "price": deal.price,
         "created_at": int(deal.created_at.astimezone().timestamp()),
         "custom_fields_values": [
-            {"field_id": f_id[DEAL_BOUGHT_TICKETS], "values": [{"value": deal.bought_tickets}]},
-        ]
+            {"field_id": d_f_id[DEAL_BOUGHT_TICKETS], "values": [{"value": deal.bought_tickets}]},
+        ],
+        "_embedded": {
+            "contacts": [
+                {
+                    "first_name": deal.contact.first_name,
+                    "last_name": deal.contact.last_name,
+                    "custom_fields_values": [
+                        {"field_id": c_f_id["Телефон"], "values": [{"value": deal.contact.phone}]},
+                        {"field_id": c_f_id["Email"], "values": [{"value": deal.contact.email}]}
+                    ]
+                }
+            ]
+        }
     }
 
 
@@ -59,7 +79,13 @@ def order_to_deal(order) -> DealDTO:
         order.cart.buyer.first_name + " " + order.cart.buyer.last_name + " " + datetime.now().strftime("%d.%m"),
         int(order.total),
         "\n\n".join(list(map(booking_to_string, bookings))),
-        datetime.now()
+        datetime.now(),
+        contact=ContactDTO(
+            first_name=order.cart.buyer.first_name,
+            last_name=order.cart.buyer.last_name,
+            email=order.cart.buyer.email,
+            phone=order.cart.buyer.phone,
+        )
     )
 
 
@@ -71,7 +97,7 @@ def group_bookings_by_place_event_time(order):
         key = (booking.event.place.name, booking.event.name, booking.time)
         grouped_data[key]['types'][booking.ticket.get_type_display()] += 1
         grouped_data[key]['price'] += int(booking.ticket.price)
-    print(grouped_data)
+
     return [
         BookingDTO(
             place_name=key[0],
