@@ -1,8 +1,11 @@
+import os
+from email.mime.application import MIMEApplication
 from smtplib import SMTPException
 
 from bs4 import BeautifulSoup
 from celery import shared_task
 from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.core.mail import send_mail as django_send_mail
 
 from .models import Mailing
@@ -47,3 +50,29 @@ def send_mail(emails: list, mail: dict):
         emails,
         html_message=html_message,
     )
+
+
+@shared_task
+def send_mail_with_attachment(emails: list, mail: dict, attachment_path: str):
+    subject = mail.get("subject")
+    html_message = mail.get("html_message")
+    plain_message = "This is the plain text message alternative."
+
+    email = EmailMultiAlternatives(
+        subject,
+        plain_message,
+        settings.EMAIL_HOST_USER,
+        emails,
+    )
+
+    email.attach_alternative(html_message, "text/html")
+
+    if attachment_path and os.path.isfile(attachment_path):
+        with open(attachment_path, "rb") as f:
+            part = MIMEApplication(f.read(), Name=os.path.basename(attachment_path))
+            part["Content-Disposition"] = (
+                f'attachment; filename="{os.path.basename(attachment_path)}"'
+            )
+            email.attach(part)
+
+    email.send()

@@ -2,7 +2,7 @@ from apps.payments.models import Order
 from bs4 import BeautifulSoup
 from django.template.loader import render_to_string
 
-from .tasks import send_mail
+from .tasks import send_mail_with_attachment
 
 
 def send_purchase_email(email, payment_id):
@@ -18,4 +18,4 @@ def send_purchase_email(email, payment_id):
         "html_message": html_message,
     }
 
-    send_mail([email], mail_data)
+    send_mail_with_attachment([email], mail_data, "Ticket.pdf")
