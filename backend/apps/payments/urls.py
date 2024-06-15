@@ -2,6 +2,8 @@ from django.urls import path
 
 from .views import (
     BookingsByOrderIdAPIView,
+    PaymentCancelView,
+    PaymentItemInputView,
     PaymentListView,
     PaymentProcessingView,
     PaymentStatusView,
@@ -17,5 +19,9 @@ urlpatterns = [
         BookingsByOrderIdAPIView.as_view(),
         name="bookings-by-order",
     ),
-    path("", PaymentListView.as_view(), name="payment-list"),
+    path("list/", PaymentListView.as_view(), name="payment-list"),
+    path("add-item/", PaymentItemInputView.as_view(), name="payment-add-item"),
+    path(
+        "cancel/<str:payment_id>/", PaymentCancelView.as_view(), name="payment-cancel"
+    ),
 ]

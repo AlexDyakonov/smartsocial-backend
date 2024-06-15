@@ -1,4 +1,5 @@
 import json
+import secrets
 
 from apps.amo.views import post_orders
 from apps.booking.models import Booking, Buyer, Cart
@@ -15,6 +16,8 @@ from rest_framework.views import APIView
 
 from .models import Order
 from .serializers import (
+    PaymentIdSerializer,
+    PaymentItemInputSerializer,
     PaymentListOutputSerializer,
     PaymentProcessingSerializer,
     PaymentStatusSerializer,
@@ -28,6 +31,72 @@ class PaymentListView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+
+class PaymentItemInputView(generics.CreateAPIView):
+    serializer_class = PaymentItemInputSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_id = request.data.get("cart_id")
+        total = request.data.get("total")
+
+        try:
+            cart = Cart.objects.get(id=cart_id)
+        except Cart.DoesNotExist:
+            return Response(
+                {"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        payment_id = secrets.token_hex(10)
+        confirmation_token = secrets.token_hex(10)
+
+        order = Order.objects.create(
+            cart=cart,
+            total=total,
+            payment_id=payment_id,
+            confirmation_token=confirmation_token,
+            ticket_file=request.data.get(
+                "ticket_file", "https://kolomnago.ru/ticket_file.pdf"
+            ),
+            qr_code=request.data.get("qr_code", "https://kolomnago.ru/qr_code"),
+            payment_status=request.data.get("payment_status", "pending"),
+        )
+
+        return Response(
+            {
+                "payment_id": payment_id,
+                "confirmation_token": confirmation_token,
+                "message": "Order created successfully",
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class PaymentCancelView(generics.GenericAPIView):
+    def patch(self, request, *args, **kwargs):
+        payment_id = kwargs.get("payment_id")
+        if payment_id is None:
+            return Response(
+                {"error": "Missing payment ID"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        order = Order.objects.filter(payment_id=payment_id).first()
+        if order is None:
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        if order.payment_status == "canceled":
+            return Response(
+                {"error": "Order already canceled"}, status=status.HTTP_409_CONFLICT
+            )
+
+        order.payment_status = "canceled"
+        order.save()
+        return Response({"success": "Payment canceled"}, status=status.HTTP_200_OK)
 
 
 class PaymentStatusView(generics.RetrieveAPIView):
