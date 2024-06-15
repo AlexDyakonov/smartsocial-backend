@@ -55,7 +55,7 @@ class Ticket(models.Model):
     personas = models.IntegerField(validators=[MinValueValidator(0)])
 
     def __str__(self):
-        return self.name
+        return self.name + " " + self.place.name
 
 
 class Event(models.Model):

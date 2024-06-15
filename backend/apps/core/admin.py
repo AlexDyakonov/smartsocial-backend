@@ -8,7 +8,7 @@ class ImageInline(admin.TabularInline):
     model = Image
     extra = 1
     readonly_fields = ("image_tag",)
-    fields = ("image_tag", "image", "caption")
+    fields = ("image_tag", "src", "caption")
 
 
 @admin.register(Place)
