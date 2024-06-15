@@ -60,7 +60,7 @@ def deal_to_json(deal: DealDTO) -> {}:
         "created_at": int(deal.created_at.astimezone().timestamp()),
         "custom_fields_values": [
             {"field_id": d_f_id[DEAL_BOUGHT_TICKETS], "values": [{"value": deal.bought_tickets}]},
-            {"field_id": d_f_id["ID заказа"], "values": [{"value": deal.bought_tickets}]},
+            {"field_id": d_f_id["ID заказа"], "values": [{"value": deal.payment_id}]},
         ],
         "_embedded": {
             "contacts": [
