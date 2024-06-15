@@ -91,9 +91,8 @@ class PaymentProcessingView(generics.GenericAPIView):
         cart.buyer = buyer
         cart.save(update_fields=["buyer"])
 
-        # TODO better existing check
         existing_order = Order.objects.filter(
-            cart_id=cart_id, payment_status="pending"
+            cart_id=cart_id, payment_status="pending", total=cart.total
         ).first()
         if existing_order:
             return Response(
