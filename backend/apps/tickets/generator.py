@@ -64,7 +64,8 @@ def generate_ticket(ticket_info, order_id):
         y_position -= 60
 
         # Генерация и вставка QR-кода
-        qr_code_path = "qrcode.png"
+        qr_code_path = f"qrcode_{order_id}.png"
+
         generate_qr_code(ticket_info["qr_data"], qr_code_path)
         c.drawImage(qr_code_path, width - 120, height - 120, width=100, height=100)
 
@@ -106,6 +107,9 @@ def generate_ticket(ticket_info, order_id):
 
         with open(output_file, "rb") as f:
             order.ticket_file.save(output_file, File(f))
+
+        with open(qr_code_path, "rb") as f:
+            order.qr_code.save(qr_code_path, File(f))
 
         order.save()
 

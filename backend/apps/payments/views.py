@@ -38,7 +38,11 @@ class PaymentStatusView(generics.RetrieveAPIView):
             )
         else:
             return Response(
-                {"payment_status": order.payment_status}, status=status.HTTP_200_OK
+                {
+                    "payment_status": order.payment_status,
+                    "total": f"{order.total}",
+                },
+                status=status.HTTP_200_OK,
             )
 
 
