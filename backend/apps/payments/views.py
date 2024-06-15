@@ -22,7 +22,6 @@ class PaymentProcessingView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         cart_id = serializer.validated_data.get("cart_id")
-        return_url = serializer.validated_data.get("return_url")
         buyer_data = serializer.validated_data.get("buyer")
 
         cart = Cart.objects.filter(id=cart_id).first()
@@ -59,7 +58,6 @@ class PaymentProcessingView(generics.GenericAPIView):
                     "payment_status": existing_order.payment_status,
                     "confirmation_token": existing_order.confirmation_token,
                     "payment_id": existing_order.payment_id,
-                    "return_url": existing_order.return_url,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -84,7 +82,6 @@ class PaymentProcessingView(generics.GenericAPIView):
                         cart=cart,
                         total=cart.total,
                         payment_id=payment_id,
-                        return_url=return_url,
                         confirmation_token=confirmation_token,
                         payment_status=payment_status,
                     )
@@ -99,7 +96,6 @@ class PaymentProcessingView(generics.GenericAPIView):
                     "confirmation_token": confirmation_token,
                     "payment_id": payment_id,
                     "payment_status": payment_status,
-                    "return_url": return_url,
                     "cart_id": cart_id,
                     "order_id": order.id,
                 },
