@@ -1,6 +1,9 @@
 import json
 
+from apps.amo.views import post_orders
 from apps.booking.models import Buyer, Cart
+from apps.mailer.utils import send_purchase_email
+from apps.payments.models import Order
 from apps.tickets.generator import generate_ticket
 from apps.tickets.utils import get_ticket_info
 from django.db import transaction
@@ -156,6 +159,7 @@ def yookassa_webhook(request):
                     order.save()
 
                     if generate_ticket(get_ticket_info(payment_id), payment_id):
+                        send_purchase_email(order.cart.buyer.email, payment_id)
                         return JsonResponse({"status": "success"}, status=200)
                     else:
                         return Response(

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <title>Поздравляем с покупкой!</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      background-color: #f4f4f8;
+      font-family: 'Inter', sans-serif;
+    }
+    table {
+      border-spacing: 3px;
+      margin: 20px auto;
+      width: 100%;
+      max-width: 600px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    td {
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 15px;
+      margin: 10px;
+      background-color: white;
+    }
+    @media (max-width: 600px) {
+      body, html {
+        padding: 10px;
+      }
+      td {
+        padding: 10px;
+        margin: 5px;
+      }
+      .container {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<table cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="border-top-left-radius: 15px; border-top-right-radius: 15px; height: 54px;">
+      <img src="https://f8a1878b-61e7-4c32-a89a-9fbc7508c0be.selstorage.ru/kg-logo.png" alt="logo">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>Спасибо за покупку билетов на нашем сайте.</b>
+      <br>
+      <br>
+      Желаем вам приятных впечатлений от посещения музеев и мероприятий!
+      <br>
+      <br>
+      В приложении к этому письму вы найдете билет с выбранными программами и штрих-кодом для регистрации на месте.
+    </td>
+  </tr>
+  <tr>
+    <td style="border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;color: rgba(0, 0, 0, 0.7);">
+      Ваш QR-код для входа<br>
+      <img src="{{ order.qr_code.url }}" style="width: 150px; height: 150px;" alt="QR-код">
+    </td>
+  </tr>
+</table>
+</body>
+</html>

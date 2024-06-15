@@ -1,15 +1,11 @@
+from apps.booking.models import Buyer
 from django.conf import settings
 from django.shortcuts import redirect, render
-
 from django.urls import reverse
 from rest_framework import generics
-from apps.booking.models import Buyer
 
 from .models import Mailing
-from .serializers import (
-    MailingSerializerReadOnly,
-    MailingSerializerWriteOnly,
-)
+from .serializers import MailingSerializerReadOnly, MailingSerializerWriteOnly
 from .tasks import send_mailing
 
 
