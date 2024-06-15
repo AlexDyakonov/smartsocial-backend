@@ -1,8 +1,9 @@
 import json
 
-from apps.booking.models import Buyer, Cart, Booking
+from apps.amo.views import post_orders
+from apps.booking.models import Booking, Buyer, Cart
+from apps.booking.serializers import BookingSerializer, Buyer
 from apps.mailer.utils import send_purchase_email
-from apps.booking.serializers import Buyer, BookingSerializer
 from apps.tickets.generator import generate_ticket
 from apps.tickets.utils import get_ticket_info
 from django.db import transaction
@@ -16,7 +17,6 @@ from rest_framework.views import APIView
 from .models import Order
 from .serializers import PaymentProcessingSerializer, PaymentStatusSerializer
 from .services import YooKassaService
-from apps.amo.views import post_orders
 
 
 @api_view(["POST"])
@@ -107,7 +107,7 @@ class PaymentProcessingView(generics.GenericAPIView):
                 status=status.HTTP_200_OK,
             )
 
-        payment_response = YooKassaService.create_payment_embedded("10", cart_id)
+        payment_response = YooKassaService.create_payment_embedded(cart.total, cart_id)
         if not payment_response:
             return Response(
                 {"error": "Payment service error"},
