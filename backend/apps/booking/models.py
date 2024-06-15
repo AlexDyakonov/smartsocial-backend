@@ -42,3 +42,4 @@ class Booking(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     time = models.DateTimeField()
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    visited = models.BooleanField(default=False)

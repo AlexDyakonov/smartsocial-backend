@@ -1,9 +1,8 @@
 import json
 
-from apps.amo.views import post_orders
-from apps.booking.models import Buyer, Cart
+from apps.booking.models import Buyer, Cart, Booking
 from apps.mailer.utils import send_purchase_email
-from apps.payments.models import Order
+from apps.booking.serializers import Buyer, BookingSerializer
 from apps.tickets.generator import generate_ticket
 from apps.tickets.utils import get_ticket_info
 from django.db import transaction
@@ -11,6 +10,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Order
 from .serializers import PaymentProcessingSerializer, PaymentStatusSerializer
@@ -175,3 +175,10 @@ def yookassa_webhook(request):
             return JsonResponse({"error": "Invalid JSON"}, status=400)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
+
+
+class BookingsByOrderIdAPIView(APIView):
+    def get(self, request, id: str):
+        order: Order = Order.objects.filter(payment_id=id).first()
+        bookings = Booking.objects.filter(cart=order.cart).all()
+        return Response(BookingSerializer(bookings, many=True).data, status.HTTP_200_OK)

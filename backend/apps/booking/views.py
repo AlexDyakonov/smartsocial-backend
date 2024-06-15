@@ -17,7 +17,7 @@ import recurring_ical_events as rec_ical
 
 from .serializers import (
     CartSerializer,
-    BuyerSerializer,
+    BuyerSerializer, BookingSerializer,
 )
 
 
@@ -151,3 +151,11 @@ class TicketsAvailableApiView(APIView):
             list(map(dataclasses.asdict, tickets_with_date)),
             status=status.HTTP_200_OK
         )
+
+
+class BookingVisitAPIView(APIView):
+    def get(self, request, pk):
+        b = Booking.objects.filter(pk=pk).first()
+        b.visited = not b.visited
+        b.save()
+        return Response(BookingSerializer(b).data, status.HTTP_200_OK)

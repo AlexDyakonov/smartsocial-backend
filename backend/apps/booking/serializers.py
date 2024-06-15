@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from .models import Buyer, Cart, CartTicket
+from .models import Buyer, Cart, CartTicket, Booking
 
 from rest_framework import serializers
 
@@ -68,3 +68,9 @@ class BuyerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buyer
         fields = ("id", "email", "phone", "first_name", "last_name")
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = ("id", "event", "ticket", "time", "visited")
