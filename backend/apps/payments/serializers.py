@@ -11,3 +11,7 @@ class BuyerPaymentSerializer(serializers.ModelSerializer):
 class PaymentProcessingSerializer(serializers.Serializer):
     cart_id = serializers.IntegerField(required=True)
     buyer = BuyerPaymentSerializer(required=True)
+
+
+class PaymentStatusSerializer(serializers.Serializer):
+    payment_id = serializers.CharField(required=True)
