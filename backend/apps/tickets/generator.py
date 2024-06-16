@@ -1,6 +1,7 @@
 import os
 
 import qrcode
+from apps.mailer.utils import send_purchase_email
 from apps.payments.models import Order
 from django.core.files import File
 from reportlab.lib.pagesizes import A4
@@ -32,7 +33,7 @@ def check_page_space(y_position, c, height):
     return y_position
 
 
-def generate_ticket(ticket_info, order_id):
+def generate_ticket(ticket_info, payment_id):
     try:
         output_file = f"{ticket_info['output_file']}.pdf"
 
@@ -64,7 +65,7 @@ def generate_ticket(ticket_info, order_id):
         y_position -= 60
 
         # Генерация и вставка QR-кода
-        qr_code_path = f"qrcode_{order_id}.png"
+        qr_code_path = f"qrcode_{payment_id}.png"
 
         generate_qr_code(ticket_info["qr_data"], qr_code_path)
         c.drawImage(qr_code_path, width - 120, height - 120, width=100, height=100)
@@ -107,7 +108,9 @@ def generate_ticket(ticket_info, order_id):
         c.showPage()
         c.save()
 
-        order = Order.objects.filter(payment_id=order_id).first()
+        order = Order.objects.filter(payment_id=payment_id).first()
+
+        send_purchase_email(order.cart.buyer.email, payment_id, output_file)
 
         with open(output_file, "rb") as f:
             order.ticket_file.save(output_file, File(f))

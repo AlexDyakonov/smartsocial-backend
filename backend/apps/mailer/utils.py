@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from .tasks import send_mail_with_attachment
 
 
-def send_purchase_email(email, payment_id):
+def send_purchase_email(email, payment_id, ticket_path):
     order = Order.objects.filter(payment_id=payment_id).first()
     qr_code_url = order.qr_code.url
     context = {"order": {"qr_code": {"url": qr_code_url}}}
@@ -18,4 +18,4 @@ def send_purchase_email(email, payment_id):
         "html_message": html_message,
     }
 
-    send_mail_with_attachment([email], mail_data, "Ticket.pdf")
+    send_mail_with_attachment([email], mail_data, ticket_path)
