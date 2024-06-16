@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "rest_framework_swagger",
     "drf_yasg",
     "whitenoise.runserver_nostatic",
+    "rest_framework_simplejwt.token_blacklist",
     # Celery
     "django_celery_results",
     # Custom
@@ -181,16 +182,23 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     # "PAGE_SIZE": 10,
-    # "DEFAULT_AUTHENTICATION_CLASSES": (
-    #     "rest_framework_simplejwt.authentication.JWTAuthentication",
-    # ),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     #    'COERCE_DECIMAL_TO_STRING': False,
 }
 
-# SIMPLE_JWT = {
-#     "TOKEN_OBTAIN_SERIALIZER": "apps.users.serializers.CustomTokenObtainPairSerializer",
-#     "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
-# }
+SIMPLE_JWT = {
+    # "TOKEN_OBTAIN_SERIALIZER": "apps.users.serializers.CustomTokenObtainPairSerializer",
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    # "SIGNING_KEY": os.getenv("DJANGO_SIGNING_KEY"),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
 
 # CELERY
 CELERY_BROKER_URL = "redis://" + os.getenv("REDIS_HOST") + ":" + os.getenv("REDIS_PORT")
