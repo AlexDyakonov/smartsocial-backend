@@ -56,10 +56,11 @@ INSTALLED_APPS = [
     "apps.payments",
     "apps.amo",
     "apps.mailer",
+    "apps.accounts",
 ]
 
 # User model
-# AUTH_USER_MODEL = "users.CustomUser"
+AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
     "apps.core.middleware.DisableCSRF",
@@ -274,7 +275,7 @@ JAZZMIN_SETTINGS = {
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {
             "name": "Landing page",
-            "url": "https://google.com",
+            "url": "https://kolomnago.ru",
             "new_window": True,
         },
         {
@@ -290,10 +291,10 @@ JAZZMIN_SETTINGS = {
     "usermenu_links": [
         {
             "name": "Landing page",
-            "url": "https://google.com/",
+            "url": "https://kolomnago.ru/",
             "new_window": True,
         },
-        # {"model": "auth.user"},
+        {"model": "auth.user"},
     ],
     #############
     # Side Menu #
@@ -307,7 +308,14 @@ JAZZMIN_SETTINGS = {
     # Hide these models when generating side menu (e.g auth.user)
     "hide_models": [],
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["auth", "users"],
+    "order_with_respect_to": [
+        "users",
+        "apps.core",
+        "apps.booking",
+        "apps.tickets",
+        "apps.payments",
+        "auth",
+    ],
     # Custom icons for side menu apps/models See https://fontawesome.com/icons?d=gallery&m=free&v=5.0.0,5.0.1,5.0.10,5.0.11,5.0.12,5.0.13,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,5.0.9,5.1.0,5.1.1,5.2.0,5.3.0,5.3.1,5.4.0,5.4.1,5.4.2,5.13.0,5.12.0,5.11.2,5.11.1,5.10.0,5.9.0,5.8.2,5.8.1,5.7.2,5.7.1,5.7.0,5.6.3,5.5.0,5.4.2
     # for the full list of 5.13.0 free icon classes
     "icons": {
