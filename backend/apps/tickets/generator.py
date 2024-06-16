@@ -110,8 +110,6 @@ def generate_ticket(ticket_info, payment_id):
 
         order = Order.objects.filter(payment_id=payment_id).first()
 
-        send_purchase_email(order.cart.buyer.email, payment_id, output_file)
-
         with open(output_file, "rb") as f:
             order.ticket_file.save(output_file, File(f))
 
