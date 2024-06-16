@@ -22,10 +22,10 @@ class Cart(models.Model):
     @property
     def total(self):
         return (
-            self.tickets.aggregate(total=Sum(F("ticket__price") * F("quantity")))[
-                "total"
-            ]
-            or 0
+                self.tickets.aggregate(total=Sum(F("ticket__price") * F("quantity")))[
+                    "total"
+                ]
+                or 0
         )
 
 
@@ -44,3 +44,4 @@ class Booking(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     visited = models.BooleanField(default=False)
     quantity = models.IntegerField(validators=[MinValueValidator(0)])
+    order = models.ForeignKey("payments.Order", on_delete=models.CASCADE, related_name="bookings")

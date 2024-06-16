@@ -39,5 +39,6 @@ def create_bookings(sender, instance, **kwargs):
                 time=t.time,
                 cart=t.cart,
                 quantity=t.ticket.personas,
+                order=instance
             )
     post_orders([instance])

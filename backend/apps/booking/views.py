@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 from .dto import EventWithDate, EventWithDateSerializer, TicketWithDate
 from .models import Buyer, Cart
 from .serializers import BookingSerializer, BuyerSerializer, CartSerializer
+from apps.amo.views import post_orders
 
 
 class CartListCreateAPIView(generics.ListCreateAPIView):
@@ -172,7 +173,8 @@ class TicketsAvailableApiView(APIView):
 
 class BookingVisitAPIView(APIView):
     def get(self, request, pk):
-        b = Booking.objects.filter(pk=pk).first()
+        b: Booking = Booking.objects.filter(pk=pk).first()
         b.visited = not b.visited
         b.save()
+        post_orders([b.order])
         return Response(BookingSerializer(b).data, status.HTTP_200_OK)
