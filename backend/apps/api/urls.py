@@ -1,6 +1,6 @@
-from django.urls import include, path
-from django.contrib.auth import views as auth_views
 from apps.mailer.views import mailing_admin
+from django.contrib.auth import views as auth_views
+from django.urls import include, path
 
 urlpatterns = [
     path("", include("apps.core.urls")),
@@ -11,4 +11,5 @@ urlpatterns = [
     path("mailer/", include("apps.mailer.urls")),
     path("api/mailing-admin/", mailing_admin, name="mailing-admin"),
     path("api/mailing-admin/logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("users/", include("apps.accounts.urls")),
 ]
