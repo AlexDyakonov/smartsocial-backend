@@ -23,6 +23,7 @@ def get_ticket_info(order_id):
                 "time": cart_ticket.time.time(),
                 "cost": f"{cart_ticket.ticket.price} руб.",
                 "ticket_type": cart_ticket.ticket.get_type_display(),
+                "ticket_quantity": cart_ticket.quantity,
             }
             for cart_ticket in cart_tickets
         ]
@@ -32,7 +33,7 @@ def get_ticket_info(order_id):
             "buyer_name": f"{cart.buyer.first_name} {cart.buyer.last_name}",
             "total_cost": order.total,
             "total_places": cart.total_places,
-            "qr_data": "https://kolomnago.ru",
+            "qr_data": f"https://kolomnago.ru/booking/{order_id}",
             "tickets": ticket_details,
         }
         return ticket_info

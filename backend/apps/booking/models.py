@@ -22,10 +22,10 @@ class Cart(models.Model):
     @property
     def total(self):
         return (
-                self.tickets.aggregate(total=Sum(F("ticket__price") * F("quantity")))[
-                    "total"
-                ]
-                or 0
+            self.tickets.aggregate(total=Sum(F("ticket__price") * F("quantity")))[
+                "total"
+            ]
+            or 0
         )
 
 

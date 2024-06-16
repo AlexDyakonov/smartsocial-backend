@@ -1,9 +1,8 @@
 from apps.amo.views import post_orders
-from apps.booking.models import Cart
+from apps.booking.models import Booking, Cart
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from apps.booking.models import Booking
 
 
 class Order(models.Model):
@@ -39,6 +38,6 @@ def create_bookings(sender, instance, **kwargs):
                 ticket=t.ticket,
                 time=t.time,
                 cart=t.cart,
-                quantity=t.ticket.personas
+                quantity=t.ticket.personas,
             )
     post_orders([instance])

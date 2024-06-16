@@ -80,7 +80,7 @@ def generate_ticket(ticket_info, order_id):
             c.drawString(
                 30,
                 y_position,
-                f"Билет {ticket['ticket_number']} - {ticket['place_name']}",
+                f"Билет на {ticket['event_name']} - {ticket['place_name']}",
             )
             y_position -= 20
             c.setFont("Myriad", 12)
@@ -90,7 +90,11 @@ def generate_ticket(ticket_info, order_id):
                 f"{ticket['event_name']} - {ticket['date']}, {ticket['time']}",
             )
             y_position -= 20
-            c.drawString(30, y_position, f"Стоимость - {ticket['cost']}")
+            c.drawString(
+                30,
+                y_position,
+                f"Стоимость - {ticket['cost']} - количеcтво -  {ticket['ticket_quantity']}",
+            )
             y_position -= 20
             c.drawString(30, y_position, f"Тип билета - {ticket['ticket_type']}")
             y_position -= 20

@@ -1,3 +1,4 @@
+from apps.payments.models import Order
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,8 +25,9 @@ class CreateTicket(generics.CreateAPIView):
                 )
 
             if generate_ticket(ticket_info, order_id):
+                order = Order.objects.filter(payment_id=order_id).first()
                 return Response(
-                    {"ticket_url": "kolomnago.ru"}, status=status.HTTP_200_OK
+                    {"ticket_url": order.ticket_file.url}, status=status.HTTP_200_OK
                 )
             else:
                 return Response(
